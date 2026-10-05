@@ -7,7 +7,7 @@
 
 **Tagline:** *Explicit-component tensor geometry and relativity for Wolfram Language.*
 
-RAY is designed around a simple workflow: define an explicit metric matrix and coordinates, optionally define a congruence \(u^\mu\), and then query curvature, invariants, kinematics, mixed-index tensors, nonzero components, or a complete report using compact commands.
+RAY is designed around a simple workflow: define an explicit metric matrix and coordinates, optionally define a congruence $u^\mu$, and then query curvature, invariants, kinematics, mixed-index tensors, nonzero components, or a complete report using compact commands.
 
 ## Current scope
 
@@ -21,16 +21,16 @@ RAY currently provides:
 - Einstein tensor;
 - Weyl tensor;
 - Kretschmann scalar;
-- \(R_{\mu\nu}R^{\mu\nu}\);
-- \(C_{\mu\nu\rho\sigma}C^{\mu\nu\rho\sigma}\);
+- $R_{\mu\nu}R^{\mu\nu}$;
+- $C_{\mu\nu\rho\sigma}C^{\mu\nu\rho\sigma}$;
 - mixed-index tensor access;
 - nonzero-component tables in readable `TraditionalForm`;
 - normalized non-null congruences;
-- \(\nabla_\mu u_\nu\) and \(\nabla_\mu u^\nu\);
+- $\nabla_\mu u_\nu$ and $\nabla_\mu u^\nu$;
 - expansion, acceleration, shear, and vorticity;
 - shear and vorticity scalars;
-- \(R_{\mu\nu}u^\mu u^\nu\);
-- \(\nabla_\mu a^\mu\);
+- $R_{\mu\nu}u^\mu u^\nu$;
+- $\nabla_\mu a^\mu$;
 - the Raychaudhuri equation term-by-term;
 - consistency checks for the kinematical decomposition and Raychaudhuri identity;
 - raw symbolic output for further algebra.
@@ -215,7 +215,7 @@ RAYDefineMetric[
 ];
 ```
 
-Define a comoving congruence. `RAYDefineCongruence` takes **contravariant** components \(u^\mu\):
+Define a comoving congruence. `RAYDefineCongruence` takes **contravariant** components $u^\mu$:
 
 ```mathematica
 RAYDefineCongruence[
@@ -235,7 +235,7 @@ RAYShearScalar[]
 RAYVorticityScalar[]
 ```
 
-Request individual components using physical indices \(0,1,2,3\):
+Request individual components using physical indices $0,1,2,3$:
 
 ```mathematica
 RAYShear["dd", 1, 1]
@@ -280,14 +280,14 @@ $$
 ```mathematica
 RAYDefineMetric[
   "Schwarzschild",
-  {t, r, $$Theta], $$Phi]},
+  {t, r, \[Theta], \[Phi]},
   DiagonalMatrix[{
     -(1 - 2 M/r),
     1/(1 - 2 M/r),
     r^2,
-    r^2 Sin[$$Theta]]^2
+    r^2 Sin[\[Theta]]^2
   }],
-  Assumptions -> r > 2 M > 0 && 0 < $$Theta] < Pi
+  Assumptions -> r > 2 M > 0 && 0 < \[Theta] < Pi
 ];
 ```
 
@@ -462,7 +462,7 @@ $$
 
 ## Raychaudhuri convention
 
-For a normalized non-null congruence in \(d>1\) dimensions,
+For a normalized non-null congruence in $d>1$ dimensions,
 
 $$
 \epsilon=u^\mu u_\mu=\pm1,
@@ -519,7 +519,7 @@ Planned or exploratory directions include:
 - spin connections;
 - Cartan structure equations;
 - differential forms and exterior calculus;
-- ADM / \(3+1\) decomposition.
+- ADM / $3+1$ decomposition.
 
 ### xAct interoperability
 
@@ -534,7 +534,7 @@ A major future goal is interoperability with the **xAct** ecosystem, including:
 
 Longer-term extensions are intended to support calculations useful in string theory and supergravity, including:
 
-- arbitrary \(p\)-form field strengths;
+- arbitrary $p$-form field strengths;
 - Hodge duals;
 - flux contractions and stress tensors;
 - Einstein-form systems in higher dimensions;
