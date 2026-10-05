@@ -1,0 +1,37 @@
+name: Repository checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  structure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check required files
+        run: |
+          test -f Kernel/RAY.wl
+          test -f PacletInfo.wl
+          test -f README.md
+          test -f LICENSE
+          test -f CITATION.cff
+          test -f Tests/RAY_Tests.wl
+
+      - name: Check package context and version
+        run: |
+          grep -q 'BeginPackage\["RAY`"\]' Kernel/RAY.wl
+          grep -q '\$RAYVersion = "1.0.0"' Kernel/RAY.wl
+          grep -q '"Version" -> "1.0.0"' PacletInfo.wl
+
+      - name: Check source delimiters
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s = Path("Kernel/RAY.wl").read_text(encoding="utf-8")
+          assert 'BeginPackage["RAY`"]' in s
+          assert 'EndPackage[]' in s
+          assert s.count('BeginPackage[') == s.count('EndPackage[') == 1
+          print("Basic package structure checks passed.")
+          PY

@@ -1,0 +1,11 @@
+wolfram-language
+mathematica
+general-relativity
+raychaudhuri-equation
+tensor-calculus
+differential-geometry
+riemann-tensor
+ricci-tensor
+weyl-tensor
+symbolic-computation
+mathematical-physics

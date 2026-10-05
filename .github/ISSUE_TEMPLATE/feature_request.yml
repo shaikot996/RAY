@@ -1,0 +1,22 @@
+name: Feature request
+description: Suggest a new RAY capability
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: What research or calculation would this enable?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed interface
+      description: Include example RAY commands if possible.
+      render: mathematica
+  - type: textarea
+    id: references
+    attributes:
+      label: Mathematical references or conventions

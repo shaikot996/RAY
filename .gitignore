@@ -1,0 +1,27 @@
+# OS/editor
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+
+# Wolfram / Mathematica generated caches and local state
+*.mx
+*.mx64
+*.mxe64
+*.bak
+*.autosave
+.mathematica/
+.Mathematica/
+.Wolfram/
+
+# Build / packaging outputs
+build/
+dist/
+PacletBuild/
+*.paclet
+
+# Test/output scratch
+tmp/
+temp/
+*.log
