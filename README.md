@@ -197,9 +197,9 @@ Standard Wolfram Language usage messages also work:
 
 Define
 
-$$
+```math
 ds^2=-dt^2+e^{2b_1(t)}dx^2+e^{2b_2(t)}dy^2+e^{2b_3(t)}dz^2.
-$$
+```
 
 ```mathematica
 RAYDefineMetric[
@@ -260,9 +260,9 @@ RAYKinematicChecks[]
 
 For the default Bianchi-I example, the expansion is
 
-$$
+```math
 \Theta=\dot b_1+\dot b_2+\dot b_3.
-$$
+```
 
 ---
 
@@ -270,12 +270,12 @@ $$
 
 Using the mostly-plus convention,
 
-$$
+```math
 ds^2=
 -\left(1-\frac{2M}{r}\right)dt^2
 +\left(1-\frac{2M}{r}\right)^{-1}dr^2
 +r^2d\theta^2+r^2\sin^2\theta\,d\phi^2.
-$$
+```
 
 ```mathematica
 RAYDefineMetric[
@@ -304,19 +304,19 @@ RAYKretschmann[]
 
 Expected vacuum checks:
 
-$$
+```math
 R_{\mu\nu}=0,
 \qquad
 R=0,
-$$
+```
 
 and
 
-$$
+```math
 R_{\mu\nu\rho\sigma}R^{\mu\nu\rho\sigma}
 =
 \frac{48M^2}{r^6}.
-$$
+```
 
 You can request a single component directly:
 
@@ -392,9 +392,9 @@ RAYShear["ud", 1, 1]
 
 returns the component corresponding to
 
-$$
+```math
 \sigma^1{}_1.
-$$
+```
 
 ---
 
@@ -441,22 +441,22 @@ rawResidual = RAYRaw["RaychaudhuriResidual"];
 
 RAY uses
 
-$$
+```math
 R^\rho{}_{\sigma\mu\nu}
 =
 \partial_\mu\Gamma^\rho{}_{\nu\sigma}
 -\partial_\nu\Gamma^\rho{}_{\mu\sigma}
 +\Gamma^\rho{}_{\mu\lambda}\Gamma^\lambda{}_{\nu\sigma}
 -\Gamma^\rho{}_{\nu\lambda}\Gamma^\lambda{}_{\mu\sigma},
-$$
+```
 
 with
 
-$$
+```math
 R_{\sigma\nu}
 =
 R^\rho{}_{\sigma\rho\nu}.
-$$
+```
 
 ---
 
@@ -464,13 +464,13 @@ $$
 
 For a normalized non-null congruence in $d>1$ dimensions,
 
-$$
+```math
 \epsilon=u^\mu u_\mu=\pm1,
-$$
+```
 
 and RAY evaluates
 
-$$
+```math
 u^\alpha\nabla_\alpha\Theta
 =
 -\frac{\Theta^2}{d-1}
@@ -478,7 +478,7 @@ u^\alpha\nabla_\alpha\Theta
 +\omega_{\mu\nu}\omega^{\mu\nu}
 -R_{\mu\nu}u^\mu u^\nu
 +\nabla_\mu a^\mu.
-$$
+```
 
 The metric itself carries the signature; RAY does not hard-code mostly-plus or mostly-minus.
 
