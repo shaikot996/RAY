@@ -66,7 +66,7 @@ RAYPlot[solution_Association,quantities_:Automatic,OptionsPattern[]] :=
   If[MissingQ[domain] || results==={},
     Return[rayFail["RAYPlot: the solution association has no numerical solutions."]]];
   {time,lo,hi}=domain;
-  q=If[quantities===Automatic,(#[time]&/@fields),
+  q=If[quantities===Automatic,(#[time]& /@ fields),
     If[ListQ[quantities],quantities,{quantities}]];
   If[q==={},Return[rayFail["RAYPlot: provide at least one quantity."]]];
   nq=Length[q];nc=Length[results];
@@ -76,7 +76,7 @@ RAYPlot[solution_Association,quantities_:Automatic,OptionsPattern[]] :=
       RGBColor[0.14,0.57,0.36],RGBColor[0.58,0.31,0.66],
       RGBColor[0.89,0.56,0.12],RGBColor[0.17,0.61,0.67]}];
   lines=OptionValue["LineStyles"];
-  If[lines===Automatic,lines={Solid,Dashed,Dotted,DotDashed}];
+  If[lines===Automatic,lines={Solid,Dotted,Dashed,DotDashed}];
   If[!ListQ[colors] || colors==={} || !ListQ[lines] || lines==={},
     Return[rayFail["RAYPlot: Colors and LineStyles must be nonempty lists."]]];
   icLabels=OptionValue["ICLabels"];
