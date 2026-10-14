@@ -51,3 +51,15 @@ RAYRaw[RAYRaychaudhuriResidual[]] := rayRayResidual[];
 
 (* A symbol holding a string can be evaluated explicitly when desired:
    RAYRaw[Evaluate[name], "dd"]. *)
+
+(* Bare command symbols are also accepted for fast notebook input. *)
+RAYRaw[RAYMetric,c_String] := RAYRaw["Metric",c];
+RAYRaw[RAYRicci,c_String] := RAYRaw["Ricci",c];
+RAYRaw[RAYEinstein,c_String] := RAYRaw["Einstein",c];
+RAYRaw[RAYRiemann,c_String] := RAYRaw["Riemann",c];
+RAYRaw[RAYWeyl,c_String] := RAYRaw["Weyl",c];
+RAYRaw[RAYShear,c_String] := RAYRaw["Shear",c];
+RAYRaw[RAYVorticity,c_String] := RAYRaw["Vorticity",c];
+RAYRaw[RAYChristoffel] := rayGamma[];
+RAYRaw[RAYRicciScalar] := rayRicciScalar[];
+RAYRaw[RAYKretschmann] := rayKretschmann[];
