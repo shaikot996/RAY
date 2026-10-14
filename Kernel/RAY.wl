@@ -155,6 +155,40 @@ RAYRaw::usage =
 RAYClearCache::usage =
 "RAYClearCache[] clears all derived tensor caches while keeping defined metrics and congruences.";
 
+RAYMetricVariables::usage = "RAYMetricVariables[] returns independent symmetric formal inverse-metric components for metric variation.";
+
+RAYScalarLagrangian::usage = "RAYScalarLagrangian[field,potential] constructs a scalar matter Lagrangian with the active coordinates.";
+
+RAYMaxwellLagrangian::usage = "RAYMaxwellLagrangian[F] constructs -F_ab F^ab/4 from explicit antisymmetric components.";
+
+RAYMatterAction::usage = "RAYMatterAction[L] computes the Hilbert stress tensor from an explicit matter Lagrangian.";
+
+RAYStressTensor::usage = "RAYStressTensor[config] displays the stored matter stress tensor. RAYRaw of StressTensor gives raw components.";
+
+RAYEinsteinEquations::usage = "RAYEinsteinEquations[G,T] generates component equations G+Lambda g=kappa T. T defaults to zero.";
+
+RAYCovD::usage = "RAYCovD[tensor,config] computes explicit component covariant derivatives; derivative index first.";
+
+RAYWarpedMetric::usage = "RAYWarpedMetric[name,blocks] defines a warped/block-diagonal metric from {coords,metric,multiplier} blocks.";
+
+RAYSymbolicMetric::usage = "RAYSymbolicMetric[name,dimension or coords] constructs a formal metric descriptor without costly inversion.";
+
+RAYInstantiateMetric::usage = "RAYInstantiateMetric[descriptor,optionalMatrix] activates explicit components from a symbolic metric.";
+
+RAYTensor::usage = "RAYTensor[name,indices] denotes a formal abstract tensor, without automatic index contraction.";
+
+RAYNabla::usage = "RAYNabla[index,expr] denotes an unevaluated abstract covariant derivative.";
+
+RAYAbstractCovD::usage = "RAYAbstractCovD[expr,index] applies formal linearity, Leibniz rule, and metric compatibility.";
+
+RAYConventions::usage = "RAYConventions[] reports dimensions, curvature signs, Einstein and stress tensor conventions.";
+
+RAYSolve::usage = "RAYSolve[equations,fields,timeDomain,initialConditionSets] solves ODEs for one or more IC sets.";
+
+RAYPlot::usage = "RAYPlot[solution,quantities] plots multiple numerical solutions; quantities keep color and ICs vary dashing.";
+
+RAYSolveWizard::usage = "RAYSolveWizard[equations,fields,timeDomain] opens interactive front-end input for ICs and plotting.";
+
 Begin["`Private`"];
 
 $RAYVersion = "1.0.0";
@@ -1361,6 +1395,28 @@ RAYAbout[] := Grid[
   Alignment -> Left,
   Spacings -> {1.5, 0.8}
 ];
+
+(* Optional development modules: loaded before leaving the private context. *)
+Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYRawExtensions.wl"}]];
+Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYMatter.wl"}]];
+Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYNumerics.wl"}]];
+Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYSymbolic.wl"}]];
+
+$rayHelpRows=Join[$rayHelpRows,{
+  {"RAYRaw[RAYRicci[dd]]","Raw form of a complete RAY geometry call."},
+  {"RAYMetricVariables[]","Symmetric formal inverse metric variables for varying matter Lagrangians."},
+  {"RAYMatterAction[L]","Calculate the Hilbert stress tensor from a matter Lagrangian."},
+  {"RAYStressTensor[dd]","Component stress tensor; use RAYRaw for algebra."},
+  {"RAYEinsteinEquations[G,T]","Einstein equations with optional cosmological constant/coupling; T defaults to zero."},
+  {"RAYCovD[tensor,config]","Component covariant derivative (derivative index first)."},
+  {"RAYWarpedMetric[name,blocks]","Metric with independently warped diagonal blocks."},
+  {"RAYSymbolicMetric[name,dim]","Formal abstract metric and coordinate-component descriptor."},
+  {"RAYAbstractCovD[expr,index]","Formal covariant derivative with product rule and metric compatibility."},
+  {"RAYConventions[]","Dimension, signature and field-equation conventions."},
+  {"RAYSolve[eqs,fields,domain,ICs]","Numerically solve one or many IC sets."},
+  {"RAYPlot[solution,quantities]","Quantity-color-consistent, IC-style-distinct plots."},
+  {"RAYSolveWizard[eqs,fields,domain]","Interactive notebook dialog for numeric workflow."}
+}];
 
 End[];
 
