@@ -9,6 +9,19 @@
 
 RAY is designed around a simple workflow: define an explicit metric matrix and coordinates, optionally define a congruence $u^\mu$, and then query curvature, invariants, kinematics, mixed-index tensors, nonzero components, or a complete report using compact commands.
 
+
+## Development branch: matter, equations, numerics and symbolic tools
+
+A new development API extends the explicit-component toolkit with:
+
+- direct raw expressions from full calls such as `RAYRaw[RAYRicci["dd"]]`;
+- scalar/Maxwell and general algebraic inverse-metric matter Lagrangians, with Hilbert stress tensors;
+- `RAYEinsteinEquations` with vacuum default and configurable cosmological constant/coupling;
+- `RAYSolve`, `RAYPlot` and a front-end `RAYSolveWizard` for multiple initial conditions;
+- `RAYCovD`, `RAYWarpedMetric`, formal `RAYSymbolicMetric`, and `RAYConventions[]`.
+
+See **[DEVELOPMENT_API.md](DEVELOPMENT_API.md)** for examples, detailed options, and the boundary between implemented component calculations and the future xAct-level symbolic engine. Run `Tests/RAY_Development_Tests.wl` for the new regression cases. This feature-branch work is not yet part of a tagged release.
+
 ## Current scope
 
 RAY currently provides:
