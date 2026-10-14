@@ -18,6 +18,12 @@ jobs:
           test -f LICENSE
           test -f CITATION.cff
           test -f Tests/RAY_Tests.wl
+          test -f Tests/RAY_Development_Tests.wl
+          test -f Kernel/RAYRawExtensions.wl
+          test -f Kernel/RAYMatter.wl
+          test -f Kernel/RAYNumerics.wl
+          test -f Kernel/RAYSymbolic.wl
+          test -f DEVELOPMENT_API.md
 
       - name: Check package context and version
         run: |
@@ -35,3 +41,6 @@ jobs:
           assert s.count('BeginPackage[') == s.count('EndPackage[') == 1
           print("Basic package structure checks passed.")
           PY
+
+      - name: Static Wolfram Language source checks
+        run: python Tests/check_wl_structure.py
