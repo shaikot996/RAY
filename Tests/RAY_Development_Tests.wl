@@ -1,7 +1,7 @@
 (* RAY extension regression tests. Run in licensed Wolfram Language:
    Get[".../Tests/RAY_Development_Tests.wl"] *)
 
-Needs["RAY\`"];
+Needs["RAY`"];
 
 ClearAll[t,x,r,ph,psi,V,a,u,alpha,kk];
 
