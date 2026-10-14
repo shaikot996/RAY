@@ -1,5 +1,5 @@
 (* RAY development examples: Wolfram Language 13+. *)
-Needs["RAY\`"];
+Needs["RAY`"];
 
 ClearAll[t,x,y,z,a,phi,V,u];
 
