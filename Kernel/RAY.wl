@@ -698,6 +698,7 @@ rayTensorByName[name_String, config_String] := Module[{base, baseCfg, target, ra
     "riemann", {rayRiemannUDDD[], {1, -1, -1, -1}},
     "ricci", {rayRicciDD[], {-1, -1}},
     "einstein", {rayEinsteinDD[], {-1, -1}},
+    "stresstensor", {rayMatterStressDD[], {-1, -1}},
     "weyl", {rayWeylDDDD[], {-1, -1, -1, -1}},
     "shear", {rayShearDD[], {-1, -1}},
     "vorticity", {rayVorticityDD[], {-1, -1}},
