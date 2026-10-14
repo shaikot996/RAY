@@ -18,7 +18,7 @@ RAYSolve[equations_List,fields_List,domain:{_Symbol,_,_},
   Do[
     raw=Quiet@Check[
       NDSolve[
-        Evaluate[Join[equations,sets[[i]]]],Evaluate[fields],domain,
+        Evaluate[Join[equations,sets[[i]]]],Evaluate[fields],Evaluate[domain],
         Method->OptionValue["Method"],
         WorkingPrecision->OptionValue["WorkingPrecision"],
         AccuracyGoal->OptionValue["AccuracyGoal"],
@@ -54,8 +54,7 @@ Options[RAYPlot]={
  "FrameLabel"->Automatic,"AxesLabel"->None,
  "PlotRange"->All,"PlotLabel"->None,
  "ImageSize"->Large,"PlotLegends"->Automatic,
- "GridLines"->None,"AspectRatio"->Automatic,
- "Joined"->True
+ "GridLines"->None,"AspectRatio"->Automatic
 };
 
 RAYPlot[solution_Association,quantities_:Automatic,OptionsPattern[]] :=
@@ -100,15 +99,17 @@ RAYPlot[solution_Association,quantities_:Automatic,OptionsPattern[]] :=
     OptionValue["PlotLegends"]];
   frameLabels=If[OptionValue["FrameLabel"]===Automatic,
     {ToString[time,InputForm],"Value"},OptionValue["FrameLabel"]];
-  Plot[Evaluate[curves],{time,lo,hi},
-    PlotStyle->styles,PlotLegends->legend,
-    Frame->OptionValue["Frame"],Axes->OptionValue["Axes"],
-    FrameLabel->frameLabels,AxesLabel->OptionValue["AxesLabel"],
-    PlotRange->OptionValue["PlotRange"],
-    PlotLabel->OptionValue["PlotLabel"],
-    ImageSize->OptionValue["ImageSize"],
-    GridLines->OptionValue["GridLines"],
-    AspectRatio->OptionValue["AspectRatio"]
+  With[{tt=time,lower=lo,upper=hi,plottedCurves=curves},
+    Plot[Evaluate[plottedCurves],{tt,lower,upper},
+      PlotStyle->styles,PlotLegends->legend,
+      Frame->OptionValue["Frame"],Axes->OptionValue["Axes"],
+      FrameLabel->frameLabels,AxesLabel->OptionValue["AxesLabel"],
+      PlotRange->OptionValue["PlotRange"],
+      PlotLabel->OptionValue["PlotLabel"],
+      ImageSize->OptionValue["ImageSize"],
+      GridLines->OptionValue["GridLines"],
+      AspectRatio->OptionValue["AspectRatio"]
+    ]
   ]
 ];
 
