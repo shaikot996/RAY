@@ -83,7 +83,38 @@ tests={
  VerificationTest[
    RAYAbstractCovD[2 RAYTensor["Metric",{a,b}],c],
    0,TestID->"Formal metric compatibility"
+ ],
+ VerificationTest[
+   Module[{eq,sol,val},
+     RAYDefineMetric["deSitterEndToEnd",{t,x,yy,zz},
+       DiagonalMatrix[{-1,a[t]^2,a[t]^2,a[t]^2}]];
+     eq=RAYEinsteinEquations[RAYRaw[RAYEinstein["dd"]],0,
+       "CosmologicalConstant"->3,"Components"->{{1,1}}];
+     sol=RAYSolve[eq,{a},{t,0,2},{a[0]==1,a'[0]==1}];
+     If[sol===$Failed,Return[False]];
+     val=N[a[2]/.sol["Solutions"][[1]]];
+     Abs[val-Exp[2]]<10^-5
+   ],True,TestID->"Einstein equations to de Sitter numerical solution"
+ ],
+ VerificationTest[
+   Module[{sol,graphic},
+     sol=RAYSolve[{u''[t]+u[t]==0},{u},{t,0,2},
+       {{u[0]==0,u'[0]==1},{u[0]==1,u'[0]==0}}];
+     If[sol===$Failed,Return[False]];
+     graphic=RAYPlot[sol,{u[t],u'[t]},
+       "Colors"->{Red,Blue},"FrameLabel"->{"t","u"}];
+     MemberQ[{Legended,Graphics},Head[graphic]]
+   ],True,TestID->"Multi-IC colored numerical plots"
+ ],
+ VerificationTest[
+   Module[{r1,r2},
+     RAYDefineMetric["BareRawTest",{t,x},DiagonalMatrix[{-1,1}]];
+     r1=RAYRaw[RAYRicci,"dd"];
+     r2=RAYRaw["Ricci","dd"];
+     r1===r2
+   ],True,TestID->"RAYRaw accepts a bare function symbol"
  ]
+
 };
 
 TestReport[tests]
