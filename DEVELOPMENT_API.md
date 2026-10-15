@@ -237,3 +237,16 @@ Tests/RAY_Handwritten_Tests.wl checks this behavior.
 RAYGeneralWarpedMetric[d,n,A[t],B[t],"Time"->t] now works with **unassigned symbolic d,n**, and returns analytic Ricci tensor block expressions, Ricci scalar, Einstein tensor and lapse-dependent results. Use "InternalGeometry"->"General" (default) for an unspecified intrinsic Ricci tensor, "Flat" for zero intrinsic curvature, {"Einstein",lambdaI}, or {"ConstantCurvature",kI}. External geometry is "Flat" by default.
 
 Use RAYWarpedBlocks for 3+ spatial warp factors, RAYWarpedFieldEquations for homogeneous matter and Lambda, RAYWarpedReport for readable formulas, and RAYWarpedToComponents once you specialize to integer dimensions. See SYMBOLIC_DN_GUIDE.md. This class assumes time-independent reference metrics and block-diagonal time-orthogonal warping.
+
+
+## 13. Coordinate-dependent warped curvature, formal nabla and Weyl rescaling
+
+The time-only RAYGeneralWarpedMetric[d,n,A[t],B[t]] uses the homogeneous warped-product identities and now rejects A[t,x], A[t]*Sin[x] or other expressions with undeclared additional coordinate symbols. For genuinely constant symbolic coefficients, supply "Parameters"->{c1,c2} as an option. Do not declare actual spatial coordinates as constants.
+
+RAYAbstractWarpedCurvature[d,n,B] yields exact formal warped-product Ricci with both d and n symbolic; the base covariant Laplacian and Hessian remain formal.
+
+RAYCovariantWarpedMetric[name,baseCoordinates,baseMetric,n,B] computes the actual base connection and covariant Hessian for a coordinate-dependent base with fixed integer number of coordinates, leaving n symbolic. Ricci-base, Ricci-fiber, scalar and Einstein-block results are exact for g_ab(x)+Exp[2B(x)] h_mn(y) with h independent of base coordinates. There are no base/fiber cross terms.
+
+RAYWeylRescale[d,omega] returns the standard arbitrary-dimensional conformal Ricci tensor/scalar expressions with formal base metric covariant derivatives. RAYPartialD and RAYNabla retain distinct semantics. RAYReadable defaults to fractional partial derivatives; use "DerivativeNotation"->"Dot" for optional time dots. RAW remains Mathematica input syntax.
+
+See Examples/RAY_CovariantWarped_Example.wl and Tests/RAY_CovariantWarped_Tests.wl.
