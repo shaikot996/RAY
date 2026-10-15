@@ -50,7 +50,7 @@ rayPrettyTensorBase[name_String] := Module[{geometry,type},
  type=StringDrop[name,StringLength[geometry]];
  If[!MemberQ[{"Metric","Ricci","Einstein","Riemann","Weyl"},type],
   Return[StyleBox[name,FontSlant->"Italic"]]];
- SubscriptBox[
+ SuperscriptBox[
    OverscriptBox[
     StyleBox[Switch[type,"Metric","g","Einstein","G","Weyl","C",_,"R"],
       FontSlant->"Italic"],"~"],
