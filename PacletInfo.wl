@@ -1,8 +1,8 @@
 PacletObject[<|
   "Name" -> "RAY",
-  "Version" -> "1.1.0",
+  "Version" -> "1.1.1",
   "WolframVersion" -> "13.0+",
-  "Description" -> "Relativity and Geometry Toolkit for explicit and abstract-index tensor calculus, matter actions and numerical relativity.",
+  "Description" -> "Relativity and Geometry Toolkit for notebook-friendly abstract tensor algebra, matter actions and numerical relativity.",
   "Category" -> "Physics",
   "Keywords" -> {
     "general relativity",
