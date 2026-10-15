@@ -55,7 +55,7 @@ RAYHandwritten /: MakeBoxes[RAYHandwritten[expr_],
    fmt:(StandardForm|TraditionalForm)] :=
  Module[{pretty,box},
    pretty=rayHandExpression[expr];
-   box=MakeBoxes[pretty,TraditionalForm];
+   box=With[{displayExpr=pretty},MakeBoxes[displayExpr,TraditionalForm]];
    With[{rendered=box},InterpretationBox[rendered,expr,Editable->False]]
  ];
 
