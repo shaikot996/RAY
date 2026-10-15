@@ -92,8 +92,8 @@ rayAbsCanonicalTerm[term_]:=Module[
   {normalized,indices,groups,dummies,mappings,perms,candidates},
   normalized=Times@@(rayAbsTensorNormalize/@rayAbsFactors[term]);
   If[normalized===0,Return[0]];
-  indices=Cases[normalized,RAYUp[x_]:>{x,1} |
-    RAYDown[x_]:>{x,-1},Infinity];
+  indices=Join[Cases[normalized,RAYUp[x_]:>{x,1},Infinity],
+    Cases[normalized,RAYDown[x_]:>{x,-1},Infinity]];
   groups=GatherBy[indices,First];
   dummies=First[First[#]]& /@
     Select[groups,Length[#]===2 &&
@@ -122,8 +122,8 @@ RAYIndexCheck[expr_] := Module[{terms,perTerm,indices,groups,invalid},
   terms=rayAbsFactors[Expand[expr]];
   If[Head[Expand[expr]]===Plus,terms=List@@Expand[expr]];
   perTerm=Table[
-    indices=Cases[term,RAYUp[x_]:>{x,1} |
-      RAYDown[x_]:>{x,-1},Infinity];
+    indices=Join[Cases[term,RAYUp[x_]:>{x,1},Infinity],
+      Cases[term,RAYDown[x_]:>{x,-1},Infinity]];
     groups=GatherBy[indices,First];
     invalid=Select[groups,
       Length[#]>2 || (Length[#]===2 &&
