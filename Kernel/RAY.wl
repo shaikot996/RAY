@@ -213,13 +213,17 @@ RAYRegisterTensor::usage = "RAYRegisterTensor[name,array,config] registers expli
 
 RAYUnregisterTensor::usage = "RAYUnregisterTensor[name] removes a user-defined component tensor from the active metric.";
 
-RAW::usage = "expr // RAW (or RAW[expr]) shows the exact unformatted Wolfram Language InputForm, unwrapping TraditionalForm and MatrixForm. The result is a display wrapper; use the original expression or RAYRaw[...] for algebra.";
+RAW::usage = "expr // RAW shows normal Mathematica notebook input syntax (StandardForm), including f\u0027[t], and unwraps large RAY tensor displays into raw arrays. Use RAYRaw[...] to obtain algebra-ready arrays.";
 
-RAYPretty::usage = "expr // RAYPretty renders symbolic expressions in traditional mathematical notation; RAYTensor and RAYNabla also display automatically in StandardForm.";
+RAYPretty::usage = "expr // RAYPretty shows handwritten math, dot time derivatives and conventional partial derivative fractions. The underlying algebra is unchanged.";
+
+RAYReadable::usage = "RAYReadable[expr] prints formulas like handwritten mathematics, using dot time derivatives and partial derivative fractions. The algebra remains unchanged.";
+
+RAYReadableTensor::usage = "RAYReadableTensor[matrix, name, config] displays nonzero coordinate-indexed components as labeled equations without a giant matrix.";
 
 Begin["`Private`"];
 
-$RAYVersion = "1.1.1";
+$RAYVersion = "1.1.2";
 RAYVersion := $RAYVersion;
 
 $rayMetrics = <||>;
@@ -1432,6 +1436,7 @@ Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYNumerics.wl"}]];
 Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYSymbolic.wl"}]];
 Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYAbstractAlgebra.wl"}]];
 Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYFormatting.wl"}]];
+Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYHandwritten.wl"}]];
 
 $rayHelpRows=Join[$rayHelpRows,{
   {"RAYRaw[RAYRicci[dd]]","Raw form of a complete RAY geometry call."},
