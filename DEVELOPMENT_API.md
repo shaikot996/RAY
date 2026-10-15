@@ -123,3 +123,79 @@ Currently supports formal tensor placeholders, covariant product rule, linearity
 - Examples/RAY_Development.wl: complete usage walkthrough.
 
 The new 8-case suite ran in a Wolfram kernel successfully after fixing stress-tensor dispatch.
+
+
+## 7. Abstract-index algebra, first Bianchi and contractions (v1.1.0)
+
+Use explicit abstract upper/lower index wrappers rather than dummy component strings:
+
+~~~mathematica
+A = RAYTensor["A",{RAYUp[a],RAYDown[b]}];
+RAYIndexCheck[A]
+
+RAYDeclareSymmetry["F","Antisymmetric"];
+RAYCanonicalize[
+  RAYTensor["F",{RAYDown[a],RAYDown[b]}]+
+  RAYTensor["F",{RAYDown[b],RAYDown[a]}]
+] (* 0 *)
+
+RAYCanonicalize[
+  RAYTensor["V",{RAYUp[i]}] RAYTensor["W",{RAYDown[i]}]-
+  RAYTensor["V",{RAYUp[j]}] RAYTensor["W",{RAYDown[j]}]
+] (* 0 *)
+
+RAYContract[
+ RAYTensor["Metric",{RAYUp[a],RAYUp[b]}]*
+ RAYTensor["F",{RAYDown[b],RAYDown[c]}],
+ "Dimension"->4
+]
+
+RAYBianchiReduce[
+ RAYTensor["Riemann",RAYDown/@{a,b,c,d}]+
+ RAYTensor["Riemann",RAYDown/@{a,c,d,b}]+
+ RAYTensor["Riemann",RAYDown/@{a,d,b,c}]
+] (* 0 *)
+
+RAYCovDCommutator[
+ RAYTensor["V",{RAYUp[c]}],a,b]
+~~~
+
+The Riemann convention matches RAY's explicit curvature convention. Dummy indices must have exactly one upper and one lower occurrence. Index-checking and abstract algebra are finite-rank symbolic facilities; performance scales with the symmetry and dummy-permutation orbit.
+
+## 8. Register arbitrary tensors and evaluate covariant derivatives
+
+~~~mathematica
+RAYDefineMetric["2D",{t,x},
+  DiagonalMatrix[{-1,Exp[2t]}]];
+
+RAYRegisterTensor["UserV",{1,Exp[t]},"u"];
+
+RAYToComponents[
+  RAYTensor["UserV",{RAYDown[a]}],
+  {RAYDown[a]}
+] (* {-1, Exp[3t]} *)
+
+RAYToComponents[
+  RAYAbstractCovD[RAYTensor["UserV",{RAYUp[b]}],a],
+  {RAYDown[a],RAYUp[b]}
+] (* matches RAYCovD[{1,Exp[t]},"u"] *)
+
+RAYUnregisterTensor["UserV"]
+~~~
+
+The first argument to RAYToComponents is an indexed expression, and the second is the ordered list of free upper/lower index slots; all repeated up/down indices are summed. Registered components are specific to the active metric.
+
+## 9. Single-file installation
+
+Download RAYStandalone.wl and execute:
+
+~~~mathematica
+Get["C:\\Users\\YourUser\\Downloads\\RAYStandalone.wl"]
+RAYVersion
+~~~
+
+Only this file is necessary for direct loading. For automatic Needs loading, install the complete application folder under $UserBaseDirectory/Applications/RAY.
+
+## 10. Verification
+
+The v1.1.0 source was tested in Wolfram Language 15: original regressions 7/7, new regressions 11/11 and timed functional benchmarks 62/62, a total of 80/80 passing cases. Run Tests/RAY_Benchmarks.wl to reproduce the benchmark suite.
