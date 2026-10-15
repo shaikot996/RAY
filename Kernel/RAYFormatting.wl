@@ -76,16 +76,17 @@ RAYDown /: MakeBoxes[RAYDown[index_],
  ];
 
 rayPrettyNablaBoxes[index_,expression_,form_] := Module[
- {script,derivative,exprBox},
- script=Switch[Head[index],
-   RAYDown,SubscriptBox["\[Del]",MakeBoxes[index[[1]],form]],
-   RAYUp,SuperscriptBox["\[Del]",MakeBoxes[index[[1]],form]],
-   _,SubscriptBox["\[Del]",MakeBoxes[index,form]]
+ {label,indexBox,derivative,exprBox},
+ label=If[MatchQ[index,RAYUp[_]|RAYDown[_]],First[index],index];
+ indexBox=With[{heldLabel=label},MakeBoxes[heldLabel,form]];
+ derivative=Which[
+   MatchQ[index,_RAYDown],SubscriptBox["\[Del]",indexBox],
+   MatchQ[index,_RAYUp],SuperscriptBox["\[Del]",indexBox],
+   True,SubscriptBox["\[Del]",indexBox]
  ];
- exprBox=MakeBoxes[expression,form];
- RowBox[{script,"(",exprBox,")"}]
+ exprBox=With[{heldExpr=expression},MakeBoxes[heldExpr,form]];
+ RowBox[{derivative,"(",exprBox,")"}]
 ];
-
 RAYNabla /: MakeBoxes[RAYNabla[index_,expression_],
    form:(StandardForm|TraditionalForm)] :=
  With[{boxes=rayPrettyNablaBoxes[index,expression,form]},
