@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCES = sorted((ROOT / "Kernel").glob("*.wl"))
 SOURCES += sorted((ROOT / "Tests").glob("*.wl"))
 SOURCES += sorted((ROOT / "Examples").glob("*.wl"))
+SOURCES += [ROOT / "RAYStandalone.wl"]
 
 
 def validate(path: Path):
