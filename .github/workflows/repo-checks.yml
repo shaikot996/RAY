@@ -27,12 +27,14 @@ jobs:
           test -f Kernel/RAYAbstractAlgebra.wl
           test -f Tests/RAY_Benchmarks.wl
           test -f RAYStandalone.wl
+          test -f Kernel/RAYFormatting.wl
+          test -f Tests/RAY_Formatting_Tests.wl
 
       - name: Check package context and version
         run: |
           grep -q 'BeginPackage\["RAY`"\]' Kernel/RAY.wl
-          grep -q '\$RAYVersion = "1.1.0"' Kernel/RAY.wl
-          grep -q '"Version" -> "1.1.0"' PacletInfo.wl
+          grep -q '\$RAYVersion = "1.1.1"' Kernel/RAY.wl
+          grep -q '"Version" -> "1.1.1"' PacletInfo.wl
 
       - name: Check source delimiters
         run: |

@@ -68,10 +68,11 @@ RAYSymbolicMetric[name_String,dim_Integer?Positive,OptionsPattern[]] :=
     Return[rayFail["RAYSymbolicMetric: signature length differs from dimension."]]];
   <|"Name"->name,"Dimension"->dim,
     "Signature"->sgn,"Symmetry"->sym,
-    "MetricTensor"->RAYTensor["Metric",{"d","d"}],
-    "InverseMetricTensor"->RAYTensor["Metric",{"u","u"}],
-    "RicciTensor"->RAYTensor["Ricci",{"d","d"}],
-    "RiemannTensor"->RAYTensor["Riemann",{"u","d","d","d"}],
+    "MetricTensor"->RAYTensor["Metric",{RAYDown["a"],RAYDown["b"]}],
+    "InverseMetricTensor"->RAYTensor["Metric",{RAYUp["a"],RAYUp["b"]}],
+    "RicciTensor"->RAYTensor["Ricci",{RAYDown["a"],RAYDown["b"]}],
+    "RiemannTensor"->RAYTensor["Riemann",
+      {RAYUp["a"],RAYDown["b"],RAYDown["c"],RAYDown["d"]}],
     "Convention"->"R^a_bcd = partial_c Gamma^a_db - partial_d Gamma^a_cb + ..."
   |>
  ];

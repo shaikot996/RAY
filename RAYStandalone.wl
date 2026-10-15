@@ -1,7 +1,4 @@
-(* RAY standalone v1.1.0 — one-file distribution.
-  Equivalent to Kernel/RAY.wl and its five extension modules.
-  Install/use: Get["C:\\path\\to\\RAYStandalone.wl"]
-  Generated from source; edit source modules rather than this bundle. *)
+(* RAY standalone v1.1.1: self-contained distribution, generated from Kernel. *)
 
 (* ::Package:: *)
 
@@ -218,9 +215,13 @@ RAYRegisterTensor::usage = "RAYRegisterTensor[name,array,config] registers expli
 
 RAYUnregisterTensor::usage = "RAYUnregisterTensor[name] removes a user-defined component tensor from the active metric.";
 
+RAW::usage = "expr // RAW (or RAW[expr]) shows the exact unformatted Wolfram Language InputForm, unwrapping TraditionalForm and MatrixForm. The result is a display wrapper; use the original expression or RAYRaw[...] for algebra.";
+
+RAYPretty::usage = "expr // RAYPretty renders symbolic expressions in traditional mathematical notation; RAYTensor and RAYNabla also display automatically in StandardForm.";
+
 Begin["`Private`"];
 
-$RAYVersion = "1.1.0";
+$RAYVersion = "1.1.1";
 RAYVersion := $RAYVersion;
 
 $rayMetrics = <||>;
@@ -1433,6 +1434,7 @@ RAYAbout[] := Grid[
 
 
 
+
 $rayHelpRows=Join[$rayHelpRows,{
   {"RAYRaw[RAYRicci[dd]]","Raw form of a complete RAY geometry call."},
   {"RAYMetricVariables[]","Symmetric formal inverse metric variables for varying matter Lagrangians."},
@@ -1450,7 +1452,7 @@ $rayHelpRows=Join[$rayHelpRows,{
 }];
 
 
-(* ---- embedded Kernel/RAYRawExtensions.wl ---- *)
+(* ---- Embedded Kernel/RAYRawExtensions.wl ---- *)
 (* RAY raw-access extension, evaluated inside the package Private context. *)
 SetAttributes[RAYRaw, HoldFirst];
 
@@ -1518,7 +1520,7 @@ RAYRaw[RAYRicciScalar] := rayRicciScalar[];
 RAYRaw[RAYKretschmann] := rayKretschmann[];
 
 
-(* ---- embedded Kernel/RAYMatter.wl ---- *)
+(* ---- Embedded Kernel/RAYMatter.wl ---- *)
 (* Explicit matter action, Hilbert stress tensor, field-equation construction. *)
 (* L_m may depend algebraically on the inverse metric, not its derivatives.
    Matter tensors/field strengths must be supplied as explicit components. *)
@@ -1667,7 +1669,7 @@ RAYEinsteinEquations[einstein_List,stress_,OptionsPattern[]] /;
 ];
 
 
-(* ---- embedded Kernel/RAYNumerics.wl ---- *)
+(* ---- Embedded Kernel/RAYNumerics.wl ---- *)
 (* RAY numerical evolution and reproducible multi-IC plotting. *)
 
 Options[RAYSolve]={
@@ -1845,7 +1847,7 @@ RAYSolveWizard[equations_List,fields_List,domain:{_Symbol,_,_}] :=
  ];
 
 
-(* ---- embedded Kernel/RAYSymbolic.wl ---- *)
+(* ---- Embedded Kernel/RAYSymbolic.wl ---- *)
 (* RAY: component covariant derivatives, warped metric products, and
    conservative abstract-index starter (not a replacement for xAct). *)
 
@@ -1916,10 +1918,11 @@ RAYSymbolicMetric[name_String,dim_Integer?Positive,OptionsPattern[]] :=
     Return[rayFail["RAYSymbolicMetric: signature length differs from dimension."]]];
   <|"Name"->name,"Dimension"->dim,
     "Signature"->sgn,"Symmetry"->sym,
-    "MetricTensor"->RAYTensor["Metric",{"d","d"}],
-    "InverseMetricTensor"->RAYTensor["Metric",{"u","u"}],
-    "RicciTensor"->RAYTensor["Ricci",{"d","d"}],
-    "RiemannTensor"->RAYTensor["Riemann",{"u","d","d","d"}],
+    "MetricTensor"->RAYTensor["Metric",{RAYDown["a"],RAYDown["b"]}],
+    "InverseMetricTensor"->RAYTensor["Metric",{RAYUp["a"],RAYUp["b"]}],
+    "RicciTensor"->RAYTensor["Ricci",{RAYDown["a"],RAYDown["b"]}],
+    "RiemannTensor"->RAYTensor["Riemann",
+      {RAYUp["a"],RAYDown["b"],RAYDown["c"],RAYDown["d"]}],
     "Convention"->"R^a_bcd = partial_c Gamma^a_db - partial_d Gamma^a_cb + ..."
   |>
  ];
@@ -1978,7 +1981,7 @@ RAYConventions[] := Grid[
 ];
 
 
-(* ---- embedded Kernel/RAYAbstractAlgebra.wl ---- *)
+(* ---- Embedded Kernel/RAYAbstractAlgebra.wl ---- *)
 (* RAY abstract-index algebra, v1.2 development.
    Indices are RAYUp[label] / RAYDown[label], e.g.
    RAYTensor["F",{RAYDown[a],RAYDown[b]}].
@@ -2384,6 +2387,133 @@ $rayHelpRows=Join[$rayHelpRows,{
  {"RAYToComponents[RAYAbstractCovD[...],free]","Evaluate an abstract covariant derivative as explicit RAYCovD components."}
 }];
 
+
+(* ---- Embedded Kernel/RAYFormatting.wl ---- *)
+(* ::Package:: *)
+(* RAY notebook presentation, v1.1.1.
+   These rules affect notebook BOXES only. All tensors remain untouched
+   Wolfram expressions usable by RAYCanonicalize, RAYContract, etc.
+   The InterpretationBox retains an exact, copyable interpretation.
+   InputForm intentionally remains unaffected so RAW exposes the code. *)
+
+rayPrettyTensorName[name_String] := Switch[name,
+  "Metric", "g",
+  "InverseMetric", "g",
+  "Riemann", "R",
+  "Ricci", "R",
+  "RicciScalar", "R",
+  "Einstein", "G",
+  "Weyl", "C",
+  "Delta", "\[Delta]",
+  "Shear", "\[Sigma]",
+  "Vorticity", "\[Omega]",
+  "Christoffel", "\[CapitalGamma]",
+  _, name
+];
+
+rayPrettyIndexBoxes[index_String,form_] := index;
+rayPrettyIndexBoxes[index_,form_] := MakeBoxes[index,form];
+
+rayPrettyScript[indices_List,form_] := Module[
+ {uppers,lowers,upBoxes,downBoxes},
+ uppers=Cases[indices,RAYUp[index_] :> index,{1}];
+ lowers=Cases[indices,RAYDown[index_] :> index,{1}];
+ upBoxes=rayPrettyIndexBoxes[#,form]& /@ uppers;
+ downBoxes=rayPrettyIndexBoxes[#,form]& /@ lowers;
+ {
+   If[upBoxes==={},None,RowBox[upBoxes]],
+   If[downBoxes==={},None,RowBox[downBoxes]]
+ }
+];
+
+rayPrettyTensorBoxes[name_String,indices_List,form_] := Module[
+ {base,up,down,output,valid},
+ base=StyleBox[rayPrettyTensorName[name],FontSlant->"Italic"];
+ valid=AllTrue[indices,MatchQ[#,_RAYUp|_RAYDown]&];
+ If[!valid,
+   Return[RowBox[{"RAYTensor","[",
+     RowBox[{MakeBoxes[name,form],",",MakeBoxes[indices,form]}],"]"}]]];
+ {up,down}=rayPrettyScript[indices,form];
+ output=Which[
+   up===None && down===None,base,
+   down===None,SuperscriptBox[base,up],
+   up===None,SubscriptBox[base,down],
+   True,SubsuperscriptBox[base,down,up]
+ ];
+ output
+];
+
+RAYTensor /: MakeBoxes[RAYTensor[name_String,indices_List],
+   form:(StandardForm|TraditionalForm)] :=
+ With[{boxes=rayPrettyTensorBoxes[name,indices,form]},
+   InterpretationBox[boxes,RAYTensor[name,indices],Editable->False]
+ ];
+
+RAYDummy /: MakeBoxes[RAYDummy[n_Integer],
+   form:(StandardForm|TraditionalForm)] :=
+ With[{boxes=SubscriptBox["\[Lambda]",MakeBoxes[n,form]]},
+   InterpretationBox[boxes,RAYDummy[n],Editable->False]
+ ];
+
+RAYUp /: MakeBoxes[RAYUp[index_],
+   form:(StandardForm|TraditionalForm)] :=
+ With[{boxes=RowBox[{"\[UpArrow]",MakeBoxes[index,form]}]},
+   InterpretationBox[boxes,RAYUp[index],Editable->False]
+ ];
+
+RAYDown /: MakeBoxes[RAYDown[index_],
+   form:(StandardForm|TraditionalForm)] :=
+ With[{boxes=RowBox[{"\[DownArrow]",MakeBoxes[index,form]}]},
+   InterpretationBox[boxes,RAYDown[index],Editable->False]
+ ];
+
+rayPrettyNablaBoxes[index_,expression_,form_] := Module[
+ {label,indexBox,derivative,exprBox},
+ label=If[MatchQ[index,RAYUp[_]|RAYDown[_]],First[index],index];
+ indexBox=rayPrettyIndexBoxes[label,form];
+ derivative=Which[
+   MatchQ[index,_RAYDown],SubscriptBox["\[Del]",indexBox],
+   MatchQ[index,_RAYUp],SuperscriptBox["\[Del]",indexBox],
+   True,SubscriptBox["\[Del]",indexBox]
+ ];
+ exprBox=With[{heldExpr=expression},MakeBoxes[heldExpr,form]];
+ RowBox[{derivative,"(",exprBox,")"}]
+];
+RAYNabla /: MakeBoxes[RAYNabla[index_,expression_],
+   form:(StandardForm|TraditionalForm)] :=
+ With[{boxes=rayPrettyNablaBoxes[index,expression,form]},
+   InterpretationBox[boxes,RAYNabla[index,expression],Editable->False]
+ ];
+
+(* Pretty is optional: abstract tensor results already typeset themselves.
+   Unlike InputForm, TraditionalForm intentionally provides human notation. *)
+RAYPretty[expression_] := TraditionalForm[expression];
+
+(* Any nested TraditionalForm / MatrixForm / TableForm supplied by RAY
+   is removed before displaying the exact underlying Wolfram input. *)
+rayRemoveDisplayWrappers[expression_] := FixedPoint[
+  ReplaceAll[#,{
+    HoldPattern[TraditionalForm[x_]] :> x,
+    HoldPattern[MatrixForm[x_,___]] :> x,
+    HoldPattern[TableForm[x_,___]] :> x,
+    HoldPattern[StandardForm[x_]] :> x,
+    HoldPattern[InputForm[x_]] :> x
+  }]&,
+  expression,
+  12
+];
+
+(* Postfix: a formatted expression // RAW.
+   The result is an InputForm DISPLAY for copy/paste. For programmatic
+   algebra use the original expression or RAYRaw[...]. *)
+RAW[expression_] := InputForm[rayRemoveDisplayWrappers[expression]];
+
+$rayHelpRows=Join[$rayHelpRows,{
+ {"RAW[expr] (or expr // RAW)","Display the exact underlying Wolfram Language expression in input notation; strips common presentation wrappers."},
+ {"RAYPretty[expr] (or expr // RAYPretty)","Display notebook-friendly traditional mathematical notation."},
+ {"RAYTensor[name,indices]","Automatically typeset A^a, g_ab, R^a_bcd, etc. in StandardForm and TraditionalForm."},
+ {"RAYNabla[index,expr]","Automatically typeset a covariant derivative with upper/lower derivative index."}
+}];
 
 End[];
 

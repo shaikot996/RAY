@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.1 — 2026-10-15
+
+- Abstract tensors, abstract indices, covariant derivatives and internal dummy indices now typeset automatically in Wolfram notebooks using editable InterpretationBox output.
+- Added postfix `expr // RAW` for Wolfram Language InputForm syntax and `expr // RAYPretty` for TraditionalForm.
+- Converted symbolic metric descriptors to proper upper/lower abstract indices.
+- Added 35 Wolfram-kernel regression cases for boxes, input roundtrips and RAW presentation; 115/115 tests passed overall.
+- Added notebook output example and one-file distribution update.
+
+
+
 ## 1.1.0 — 2026-10-15
 
 - Added one-file `RAYStandalone.wl` distribution.
