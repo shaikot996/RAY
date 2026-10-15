@@ -237,6 +237,12 @@ RAYWarpedFieldEquations::usage = "RAYWarpedFieldEquations[model,source] derives 
 RAYCovariantWarpedMetric::usage = "RAYCovariantWarpedMetric[name,coordinates,baseMetric,n,B,opts] computes the exact warped-product Ricci and Einstein tensors for an arbitrary coordinate-dependent base metric and a fiber of symbolic dimension n, including Hessian and gradient contributions.";
 RAYCovariantWarpedReport::usage = "RAYCovariantWarpedReport[model] displays the fully coordinate-covariant warped curvature and derivatives.";
 RAYPartialD::usage = "RAYPartialD[expression,index] is a formal coordinate partial derivative, distinct from the tensorial covariant derivative RAYNabla[index,expression].";
+RAYAbstractWarpedCurvature::usage = "RAYAbstractWarpedCurvature[d,n,B] derives exact covariant base/fiber Ricci formulas with d,n symbolic, using a base covariant Hessian and Laplace-Beltrami operator.";
+RAYWeylRescale::usage = "RAYWeylRescale[d,omega] derives exact Ricci tensor and scalar transformations under g' = Exp[2 omega] g in arbitrary symbolic dimension d.";
+RAYCovariantHessian::usage = "RAYCovariantHessian[f,a,b] formally represents nabla_a nabla_b f with respect to the base metric.";
+RAYCovariantBox::usage = "RAYCovariantBox[f] formally represents the base metric Laplace-Beltrami operator on f.";
+RAYGradientNorm::usage = "RAYGradientNorm[f] formally represents (nabla f)^2 = g^ab partial_a f partial_b f.";
+
 
 Begin["`Private`"];
 
