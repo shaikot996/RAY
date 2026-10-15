@@ -150,9 +150,9 @@ wHess=Table[D[omega[t,x],{t,x,y}[[i]],
   {t,x,y}[[j]]],{i,3},{j,3}];
 wBox=-D[omega[t,x],{t,2}]+D[omega[t,x],{x,2}];
 wNorm=-wGrad[[1]]^2+wGrad[[2]]^2;
-weylRicExpected=-wHess-DiagonalMatrix[{-1,1,1]]wBox+
- Outer[Times,wGrad,wGrad]-DiagonalMatrix[{-1,1,1]]wNorm;
-weylScalarExpected=Exp[-2omega[t,x]](-4wBox-2wNorm);
+weylRicExpected=-wHess-wBox*DiagonalMatrix[{-1,1,1]]+
+ Outer[Times,wGrad,wGrad]-wNorm*DiagonalMatrix[{-1,1,1]];
+weylScalarExpected=Exp[-2omega[t,x]]*(-4*wBox-2*wNorm);
 
 AppendTo[tests,VerificationTest[
  FullSimplify[weylScalar-weylScalarExpected],
