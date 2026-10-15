@@ -68,7 +68,32 @@ If you prefer the conventional application installation, download the **whole re
 
 The extended API is described in [DEVELOPMENT_API.md](DEVELOPMENT_API.md), and [release notes](RELEASE_NOTES_v1.1.0.md) explain the implemented and still-experimental parts.
 
-**Kernel verification:** 7 original regression tests, 11 development tests and 62 timed benchmark cases passed (80/80). Run Tests/RAY_Benchmarks.wl for reproducible functional benchmarks; GUI wizard interaction requires a local Mathematica front end.
+**Kernel verification:** 7 original regression tests, 11 development tests, 62 benchmarks and 35 formatting cases passed (115/115). Run Tests/RAY_Benchmarks.wl for reproducible functional benchmarks; GUI wizard interaction requires a local Mathematica front end.
+
+---
+
+## Notebook-friendly mathematical output (v1.1.1)
+
+Abstract RAY tensors now render automatically in Mathematica's default **StandardForm** and **TraditionalForm** as \(A^i\), \(B_i\), \(g_{ab}\), \(R^a{}_{bcd}\), \(\nabla_a A^b\), etc. The display is backed by an **InterpretationBox**, so copying the box back into an input cell preserves the underlying RAYTensor or RAYNabla expression. Mathematical formatting does not change symbolic evaluation, tensor canonicalization or contractions.
+
+~~~mathematica
+expr = RAYTensor["A",{RAYUp[i]}] RAYTensor["B",{RAYDown[i]}] -
+       RAYTensor["A",{RAYUp[j]}] RAYTensor["B",{RAYDown[j]}];
+
+expr                             (* mathematical notation by default *)
+expr // RAYPretty                (* explicitly request TraditionalForm *)
+expr // RAW                      (* show input syntax: RAYTensor[...] *)
+RAYCanonicalize[expr]            (* 0 *)
+
+RAYTensor["Riemann",
+  {RAYUp[a],RAYDown[b],RAYDown[c],RAYDown[d]}]
+
+RAYAbstractCovD[RAYTensor["A",{RAYUp[b]}],a]
+~~~
+
+**Postfix RAW**: `expr // RAW` is equivalent to `RAW[expr]`. It unwraps common TraditionalForm/MatrixForm/TableForm wrappers and **displays** the exact Wolfram Language syntax using InputForm. `RAW` returns an InputForm **display wrapper**, not a replacement for the algebraic expression; keep the original `expr` for further tensor manipulation (or use RAYRaw[...] for explicit tensors). For example, `RAYRicci["dd"] // RAW` shows an unformatted component matrix.
+
+The 35-case formatting suite at `Tests/RAY_Formatting_Tests.wl` checks tensor typography, inverse conversion, postfix RAW and compatibility with existing component displays. Along with previous tests, v1.1.1 has **115 passing Wolfram kernel checks**. These include programmatic notebook-box round trips; graphical notebook front-end interaction has not been tested separately.
 
 ---
 
