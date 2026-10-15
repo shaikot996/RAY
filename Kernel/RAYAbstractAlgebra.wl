@@ -42,7 +42,7 @@ rayAbsGenerators[name_,idx_List]:=Module[{n=Length[idx],gens={},sym},
     AppendTo[gens,{{3,4},-1}];
     If[SameQ@@(rayAbsVariance/@idx),
       AppendTo[gens,{{1,2},-1}];
-      AppendTo[gens,{{1,3,2,4},1}]]];
+      AppendTo[gens,{{3,4,1,2},1}]]];
   If[KeyExistsQ[$rayAbstractSymmetries,name],
     sym=$rayAbstractSymmetries[name];
     If[Max[sym["Slots"]]<=n,
