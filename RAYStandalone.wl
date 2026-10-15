@@ -2608,7 +2608,7 @@ rayReadableComponentRows[data_List,config_String,name_String,
    If[!TrueQ[v===0] && !TrueQ[PossibleZeroQ[v]],
      AppendTo[rows,{rayReadableComponentLabel[name,config,{i,j}],v}]],
    {i,d},{j,d}];
- If[Length[rows]>maxRows,Take[rows,maxRows],rows]
+ rows
 ];
 
 RAYComponentDisplay /: MakeBoxes[
