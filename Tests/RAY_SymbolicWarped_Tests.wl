@@ -140,15 +140,15 @@ gwCases={
  gwCheck["38-multi-block-three-scalar",
   TrueQ[FullSimplify[
    gwThree["RicciScalar"]-
-   (2 A''[t]+4 B''[t]+2n C''[t]+
-    (A'[t]+2 B'[t]+n C'[t])^2+
-    A'[t]^2+2 B'[t]^2+n C'[t]^2+
+   (2 A''[t]+4 B''[t]+2n Fwarp''[t]+
+    (A'[t]+2 B'[t]+n Fwarp'[t])^2+
+    A'[t]^2+2 B'[t]^2+n Fwarp'[t]^2+
     Exp[-2Fwarp[t]] RAYIntrinsicScalar["z"])==0]]],
  gwCheck["39-multi-block-three-Hamiltonian",
   TrueQ[FullSimplify[
    gwThree["EinsteinTimeTime"]-
-   ((A'[t]+2 B'[t]+n C'[t])^2-
-     A'[t]^2-2 B'[t]^2-n C'[t]^2+
+   ((A'[t]+2 B'[t]+n Fwarp'[t])^2-
+     A'[t]^2-2 B'[t]^2-n Fwarp'[t]^2+
        Exp[-2Fwarp[t]]RAYIntrinsicScalar["z"])/2==0]]],
  gwCheck["40-Einstein-reference-geometry",
   TrueQ[FullSimplify[
