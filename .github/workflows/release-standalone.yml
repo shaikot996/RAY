@@ -1,0 +1,99 @@
+name: Build and publish standalone RAY
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - RAYStandalone.wl
+      - PacletInfo.wl
+      - 'RELEASE_NOTES_v*.md'
+      - .github/workflows/release-standalone.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ray-standalone-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build downloadable release
+    runs-on: ubuntu-latest
+    if: github.repository == 'shaikot996/RAY'
+
+    steps:
+      - name: Check out release source and tags
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate standalone source integrity
+        run: |
+          python Tests/check_wl_structure.py
+          python Tests/check_standalone_consistency.py
+
+      - name: Read and validate package version
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          paclet = Path("PacletInfo.wl").read_text(encoding="utf-8")
+          match = re.search(r'"Version"\s*->\s*"([0-9]+\.[0-9]+\.[0-9]+)"', paclet)
+          if not match:
+              raise SystemExit("PacletInfo.wl has no valid semver version")
+
+          version = match.group(1)
+          notes = Path(f"RELEASE_NOTES_v{version}.md")
+          if not notes.is_file():
+              raise SystemExit(f"Missing release notes: {notes}")
+          if not Path("RAYStandalone.wl").is_file():
+              raise SystemExit("Missing RAYStandalone.wl")
+
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env:
+              env.write(f"RAY_VERSION={version}\n")
+              env.write(f"RAY_TAG=v{version}\n")
+              env.write(f"RAY_RELEASE_NOTES={notes}\n")
+          print(f"Ready to package RAY v{version}")
+          PY
+
+      - name: Package standalone distribution and hashes
+        shell: bash
+        run: |
+          ZIP_NAME="RAY-v${RAY_VERSION}-standalone.zip"
+          zip -q "$ZIP_NAME" RAYStandalone.wl QUICKSTART.md "$RAY_RELEASE_NOTES"
+          sha256sum RAYStandalone.wl "$ZIP_NAME" > SHA256SUMS.txt
+          echo "RAY_ZIP=$ZIP_NAME" >> "$GITHUB_ENV"
+          cat SHA256SUMS.txt
+
+      - name: Publish versioned GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${\{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "$RAY_TAG" >/dev/null 2>&1; then
+            echo "Release $RAY_TAG already exists. Preserving versioned assets."
+            exit 0
+          fi
+
+          if git rev-parse -q --verify "refs/tags/$RAY_TAG" >/dev/null 2>&1; then
+            echo "Tag $RAY_TAG already exists without a GitHub release; refusing to move it."
+            exit 1
+          fi
+
+          gh release create "$RAY_TAG" \
+            RAYStandalone.wl \
+            "$RAY_ZIP" \
+            SHA256SUMS.txt \
+            --target "$GITHUB_SHA" \
+            --title "RAY v${RAY_VERSION} — Standalone Mathematica package" \
+            --notes-file "$RAY_RELEASE_NOTES" \
+            --latest
+
+          echo "Release: https://github.com/${GITHUB_REPOSITORY}/releases/tag/${RAY_TAG}"
+          echo "Direct download: https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/RAYStandalone.wl"
