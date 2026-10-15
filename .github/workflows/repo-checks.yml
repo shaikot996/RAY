@@ -29,14 +29,17 @@ jobs:
           test -f RAYStandalone.wl
           test -f Kernel/RAYFormatting.wl
           test -f Kernel/RAYHandwritten.wl
+          test -f Kernel/RAYSymbolicWarped.wl
+          test -f Tests/RAY_SymbolicWarped_Tests.wl
+          test -f SYMBOLIC_DN_GUIDE.md
           test -f Tests/RAY_Handwritten_Tests.wl
           test -f Tests/RAY_Formatting_Tests.wl
 
       - name: Check package context and version
         run: |
           grep -q 'BeginPackage\["RAY`"\]' Kernel/RAY.wl
-          grep -q '\$RAYVersion = "1.1.2"' Kernel/RAY.wl
-          grep -q '"Version" -> "1.1.2"' PacletInfo.wl
+          grep -q '\$RAYVersion = "1.2.0"' Kernel/RAY.wl
+          grep -q '"Version" -> "1.2.0"' PacletInfo.wl
 
       - name: Check source delimiters
         run: |
