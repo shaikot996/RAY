@@ -47,7 +47,7 @@ rayWarpTime[specs_,lapse_,time_] := Module[{candidates},
 rayWarpTimeOnlyQ[warp_,time_Symbol,parameters_List:{}] :=
  Module[{symbols},
   symbols=DeleteDuplicates@Cases[HoldComplete[warp],
-    s_Symbol /; Context[s]=!="System\`" :> s,Infinity];
+    s_Symbol /; Context[s]=!="System`" :> s,Infinity];
   Complement[symbols,Join[{time},parameters]]==={}
  ];
 
