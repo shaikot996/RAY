@@ -233,9 +233,14 @@ RAYIntrinsicScalar::usage = "RAYIntrinsicScalar[name] is an inert placeholder fo
 
 RAYWarpedFieldEquations::usage = "RAYWarpedFieldEquations[model,source] derives Einstein equations with Lambda and homogeneous energy density/pressures for symbolic d+n blocks, retaining full tensor equations for non-Einstein reference geometries.";
 
+
+RAYCovariantWarpedMetric::usage = "RAYCovariantWarpedMetric[name,coordinates,baseMetric,n,B,opts] computes the exact warped-product Ricci and Einstein tensors for an arbitrary coordinate-dependent base metric and a fiber of symbolic dimension n, including Hessian and gradient contributions.";
+RAYCovariantWarpedReport::usage = "RAYCovariantWarpedReport[model] displays the fully coordinate-covariant warped curvature and derivatives.";
+RAYPartialD::usage = "RAYPartialD[expression,index] is a formal coordinate partial derivative, distinct from the tensorial covariant derivative RAYNabla[index,expression].";
+
 Begin["`Private`"];
 
-$RAYVersion = "1.2.0";
+$RAYVersion = "1.2.1";
 RAYVersion := $RAYVersion;
 
 $rayMetrics = <||>;
@@ -1450,6 +1455,7 @@ Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYAbstractAlgebra.wl"}]];
 Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYFormatting.wl"}]];
 Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYHandwritten.wl"}]];
 Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYSymbolicWarped.wl"}]];
+Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYCovariantWarped.wl"}]];
 
 $rayHelpRows=Join[$rayHelpRows,{
   {"RAYRaw[RAYRicci[dd]]","Raw form of a complete RAY geometry call."},
