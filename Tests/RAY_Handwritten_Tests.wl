@@ -43,12 +43,12 @@ hhTests={
  ],
  VerificationTest[
    !FreeQ[ToBoxes[RAYRicci["dd"],StandardForm],
-     OverscriptBox["A","."]],
-   True,TestID->"09-time-derivative-dot-A"
+     TagBox[_FractionBox,"InactiveDTraditional",___]],
+   True,TestID->"09-default-partial-Ricci"
  ],
  VerificationTest[
    !FreeQ[ToBoxes[RAYRicci["dd"],StandardForm],
-     OverscriptBox[OverscriptBox["A","."],"."]],
+     TagBox[_FractionBox,"InactiveDTraditional",___]],
    True,TestID->"10-time-derivative-two-dots"
  ],
  VerificationTest[
@@ -150,7 +150,8 @@ hhTests={
    True,TestID->"30-no-physics-regression"
  ],
  VerificationTest[
-   Module[{expr=RAYReadable[A''[t]+A'[t]^2]},
+   Module[{expr=RAYReadable[A''[t]+A'[t]^2,
+      "DerivativeNotation"->"Dot"]},
      !FreeQ[ToBoxes[expr,StandardForm],OverscriptBox["A","."]]],
    True,TestID->"31-readable-dot-command"
  ],
