@@ -1,4 +1,4 @@
-(* RAY standalone v1.2.0 — exact symbolic d+n warped blocks and field equations. *)
+(* RAY standalone v1.2.1 — covariant warped geometry and differential operators. *)
 
 (* ::Package:: *)
 
@@ -235,9 +235,20 @@ RAYIntrinsicScalar::usage = "RAYIntrinsicScalar[name] is an inert placeholder fo
 
 RAYWarpedFieldEquations::usage = "RAYWarpedFieldEquations[model,source] derives Einstein equations with Lambda and homogeneous energy density/pressures for symbolic d+n blocks, retaining full tensor equations for non-Einstein reference geometries.";
 
+
+RAYCovariantWarpedMetric::usage = "RAYCovariantWarpedMetric[name,coordinates,baseMetric,n,B,opts] computes the exact warped-product Ricci and Einstein tensors for an arbitrary coordinate-dependent base metric and a fiber of symbolic dimension n, including Hessian and gradient contributions.";
+RAYCovariantWarpedReport::usage = "RAYCovariantWarpedReport[model] displays the fully coordinate-covariant warped curvature and derivatives.";
+RAYPartialD::usage = "RAYPartialD[expression,index] is a formal coordinate partial derivative, distinct from the tensorial covariant derivative RAYNabla[index,expression].";
+RAYAbstractWarpedCurvature::usage = "RAYAbstractWarpedCurvature[d,n,B] derives exact covariant base/fiber Ricci formulas with d,n symbolic, using a base covariant Hessian and Laplace-Beltrami operator.";
+RAYWeylRescale::usage = "RAYWeylRescale[d,omega] derives exact Ricci tensor and scalar transformations under g' = Exp[2 omega] g in arbitrary symbolic dimension d.";
+RAYCovariantHessian::usage = "RAYCovariantHessian[f,a,b] formally represents nabla_a nabla_b f with respect to the base metric.";
+RAYCovariantBox::usage = "RAYCovariantBox[f] formally represents the base metric Laplace-Beltrami operator on f.";
+RAYGradientNorm::usage = "RAYGradientNorm[f] formally represents (nabla f)^2 = g^ab partial_a f partial_b f.";
+
+
 Begin["`Private`"];
 
-$RAYVersion = "1.2.0";
+$RAYVersion = "1.2.1";
 RAYVersion := $RAYVersion;
 
 $rayMetrics = <||>;
@@ -1453,6 +1464,7 @@ RAYAbout[] := Grid[
 
 
 
+
 $rayHelpRows=Join[$rayHelpRows,{
   {"RAYRaw[RAYRicci[dd]]","Raw form of a complete RAY geometry call."},
   {"RAYMetricVariables[]","Symmetric formal inverse metric variables for varying matter Lagrangians."},
@@ -1468,7 +1480,6 @@ $rayHelpRows=Join[$rayHelpRows,{
   {"RAYPlot[solution,quantities]","Quantity-color-consistent, IC-style-distinct plots."},
   {"RAYSolveWizard[eqs,fields,domain]","Interactive notebook dialog for numeric workflow."}
 }];
-
 
 (* --- Embedded Kernel/RAYRawExtensions.wl --- *)
 (* RAY raw-access extension, evaluated inside the package Private context. *)
@@ -2444,9 +2455,68 @@ rayPrettyScript[indices_List,form_] := Module[
  }
 ];
 
+
+rayPrettyGeometryLabel[name_String] := Switch[name,
+ "External","ext","Internal","int","Fiber","fib",_,name];
+
+rayPrettyTensorBase[name_String] := Module[{geometry,type},
+ geometry=Which[
+  StringStartsQ[name,"External"],"External",
+  StringStartsQ[name,"Internal"],"Internal",
+  StringStartsQ[name,"Fiber"],"Fiber",
+  True,None];
+ If[geometry===None,
+  Return[StyleBox[rayPrettyTensorName[name],FontSlant->"Italic"]]];
+ type=StringDrop[name,StringLength[geometry]];
+ If[!MemberQ[{"Metric","Ricci","Einstein","Riemann","Weyl"},type],
+  Return[StyleBox[name,FontSlant->"Italic"]]];
+ SuperscriptBox[
+   OverscriptBox[
+    StyleBox[Switch[type,"Metric","g","Einstein","G","Weyl","C",_,"R"],
+      FontSlant->"Italic"],"~"],
+   rayPrettyGeometryLabel[geometry]]
+];
+
+RAYIntrinsicScalar /: MakeBoxes[RAYIntrinsicScalar[name_String],
+ form:(StandardForm|TraditionalForm)] :=
+ With[{pretty=SubscriptBox[OverscriptBox["R","~"],
+     rayPrettyGeometryLabel[name]]},
+  InterpretationBox[pretty,RAYIntrinsicScalar[name],Editable->False]];
+
+RAYCovariantHessian /: MakeBoxes[
+ RAYCovariantHessian[expression_,i_,j_],
+ form:(StandardForm|TraditionalForm)] :=
+ With[{pretty=RowBox[{
+  SubscriptBox["\[Del]",rayPrettyIndexBoxes[
+    If[MatchQ[i,_RAYDown|_RAYUp],First[i],i],form]],
+  SubscriptBox["\[Del]",rayPrettyIndexBoxes[
+    If[MatchQ[j,_RAYDown|_RAYUp],First[j],j],form]],
+  "(",MakeBoxes[expression,form],")"}]},
+  InterpretationBox[pretty,RAYCovariantHessian[expression,i,j],
+    Editable->False]];
+
+RAYCovariantBox /: MakeBoxes[RAYCovariantBox[expression_],
+ form:(StandardForm|TraditionalForm)] :=
+ With[{pretty=RowBox[{"\[EmptySquare]","(",
+   MakeBoxes[expression,form],")"}]},
+  InterpretationBox[pretty,RAYCovariantBox[expression],Editable->False]];
+
+RAYGradientNorm /: MakeBoxes[RAYGradientNorm[expression_],
+ form:(StandardForm|TraditionalForm)] :=
+ With[{pretty=SuperscriptBox[
+  RowBox[{"(", "\[Del]",MakeBoxes[expression,form],")"}],"2"]},
+  InterpretationBox[pretty,RAYGradientNorm[expression],Editable->False]];
+
+RAYPartialD /: MakeBoxes[RAYPartialD[expression_,index_],
+ form:(StandardForm|TraditionalForm)] :=
+ With[{pretty=RowBox[{
+    SubscriptBox["\[PartialD]",rayPrettyIndexBoxes[index,form]],
+    "(",MakeBoxes[expression,form],")"}]},
+  InterpretationBox[pretty,RAYPartialD[expression,index],Editable->False]];
+
 rayPrettyTensorBoxes[name_String,indices_List,form_] := Module[
  {base,up,down,output,valid},
- base=StyleBox[rayPrettyTensorName[name],FontSlant->"Italic"];
+ base=rayPrettyTensorBase[name];
  valid=AllTrue[indices,MatchQ[#,_RAYUp|_RAYDown]&];
  If[!valid,
    Return[RowBox[{"RAYTensor","[",
@@ -2540,16 +2610,16 @@ $rayHelpRows=Join[$rayHelpRows,{
    Presentation wrappers preserve the exact Mathematica expression.
    No curvature values, geometry data or tensor algorithms are modified. *)
 
-Options[RAYReadable] = {"FactorTimeWarp" -> True};
+Options[RAYReadable] = {"FactorTimeWarp" -> True, "DerivativeNotation" -> "Partial"};
 
 rayHandTimeQ[x_] := MatchQ[x,_Symbol] &&
   MemberQ[{"t","time","tau","\[Tau]"},SymbolName[Unevaluated[x]]];
 
-rayHandDerivative[f_, orders_List, args_List] := Module[
+rayHandDerivative[f_, orders_List, args_List,notation_:"Partial"] := Module[
   {nn=Total[orders], vars, pairs, bare=f},
   If[Length[orders]=!=Length[args] || nn===0,
     Return[(Derivative@@orders)[f]@@args]];
-  If[Length[args]===1 && rayHandTimeQ[First[args]] &&
+  If[notation==="Dot" && Length[args]===1 && rayHandTimeQ[First[args]] &&
      1<=nn<=3,
     Return[(Nest[OverDot,bare,nn])@@args]];
   pairs=MapThread[If[#2===1,#1,{#1,#2}]&,{args,orders}];
@@ -2560,9 +2630,9 @@ rayHandDerivative[f_, orders_List, args_List] := Module[
 
 (* Replace ordinary Derivative[n1,n2,...][f][args] only for display.
    Inactive[D] renders conventional partial derivative fractions. *)
-rayHandExpression[expr_] := expr /. HoldPattern[
+rayHandExpression[expr_,notation_:"Partial"] := expr /. HoldPattern[
   Derivative[orders__Integer][f_][args__]] :>
-   rayHandDerivative[f,{orders},{args}];
+   rayHandDerivative[f,{orders},{args},notation];
 
 rayReadableWarpFactors[expr_] :=
  DeleteDuplicates@Cases[Unevaluated[expr],
@@ -2586,7 +2656,15 @@ rayReadableSimplify[expr_,factorWarp_:True] := Module[
    and explicit partials for multivariable functions. *)
 RAYReadable[expression_,OptionsPattern[]] :=
   RAYHandwritten[rayReadableSimplify[expression,
-   OptionValue["FactorTimeWarp"]]];
+   OptionValue["FactorTimeWarp"]],OptionValue["DerivativeNotation"]];
+
+RAYHandwritten /: MakeBoxes[RAYHandwritten[expr_,notation_],
+   fmt:(StandardForm|TraditionalForm)] :=
+ Module[{pretty,box},
+   pretty=rayHandExpression[expr,notation];
+   box=With[{displayExpr=pretty},MakeBoxes[displayExpr,TraditionalForm]];
+   With[{rendered=box},InterpretationBox[rendered,expr,Editable->False]]
+ ];
 
 RAYHandwritten /: MakeBoxes[RAYHandwritten[expr_],
    fmt:(StandardForm|TraditionalForm)] :=
@@ -2742,7 +2820,7 @@ RAYWeylSquared[] /; rayRequireMetric[]===True :=
 rayRemoveDisplayWrappers[expression_] := FixedPoint[
   ReplaceAll[#,{
     HoldPattern[RAYComponentDisplay[array_,___]] :> array,
-    HoldPattern[RAYHandwritten[x_]] :> x,
+    HoldPattern[RAYHandwritten[x_,___]] :> x,
     HoldPattern[TraditionalForm[x_]] :> x,
     HoldPattern[MatrixForm[x_,___]] :> x,
     HoldPattern[TableForm[x_,___]] :> x,
@@ -2770,7 +2848,7 @@ RAW[expression_] :=
   RAYNotebookInput[rayRemoveDisplayWrappers[expression]];
 
 $rayHelpRows=Join[$rayHelpRows,{
- {"RAYReadable[expr]","Readable math with dot time derivatives, partial derivative fractions and collected warp factors."},
+ {"RAYReadable[expr]","Readable partial derivative fractions by default; choose \"DerivativeNotation\"->\"Dot\" for time derivatives."},
  {"RAYReadableTensor[matrix,name,config]","List nonzero coordinate-indexed tensor components as equations."},
  {"RAYRicci[dd]","Readable nonzero Ricci components, preserving full underlying tensor data."},
  {"RAW[expr] (or expr // RAW)","Mathematica notebook input syntax: primes, square brackets, complete raw expressions and unformatted RAYTensor code."}
@@ -2818,6 +2896,18 @@ rayWarpTime[specs_,lapse_,time_] := Module[{candidates},
  If[Length[candidates]===1,First[candidates],$Failed]
 ];
 
+
+(* The symbolic Hubble-block formulas assume that each warp is a function
+   of the common time alone. Reject multivariable coordinate-dependent
+   functions instead of silently dropping their spatial gradients.
+   Bare symbols are parameters unless users supply separate coordinates. *)
+rayWarpTimeOnlyQ[warp_,time_Symbol] := Module[{functions},
+ functions=Cases[HoldComplete[warp],
+   HoldPattern[f_Symbol[args___]] /; Context[f]=!="System\`" :>
+     HoldComplete[args],Infinity];
+ AllTrue[functions,MatchQ[#,HoldComplete[time]]&]
+];
+
 RAYWarpedBlocks[specs_List,OptionsPattern[]] := Module[
  {time,lapse=OptionValue["Lapse"],ass=OptionValue["Assumptions"],
   mode=OptionValue["Simplification"],simple,geom,dimensions,warps,
@@ -2835,6 +2925,11 @@ RAYWarpedBlocks[specs_List,OptionsPattern[]] := Module[
  time=rayWarpTime[specs,lapse,OptionValue["Time"]];
  If[time===$Failed,
    Return[rayFail["RAYWarpedBlocks: specify \"Time\"->t or use a single time variable in all warps."]]];
+ If[!AllTrue[warps,rayWarpTimeOnlyQ[#,time]&] ||
+   !rayWarpTimeOnlyQ[lapse,time],
+  Return[rayFail[
+   "RAYWarpedBlocks: warp factors and lapse must depend on time only. For A[t,x] or B[t,x], use RAYCovariantWarpedMetric with a coordinate-dependent base metric; the time-only Ricci formulas would omit spatial gradients."
+  ]]];
  geom=Map[rayWarpGeometry[#[[4]],#[[2]],#[[1]]]&,specs];
  If[MemberQ[geom,$Failed],
    Return[rayFail["RAYWarpedBlocks: geometry must be Flat, General, {General,R}, {Einstein,lambda}, or {ConstantCurvature,K}."]]];
@@ -3032,6 +3127,174 @@ $rayHelpRows=Join[$rayHelpRows,{
  {"RAYIntrinsicScalar[name]","Placeholder for an unspecified intrinsic scalar curvature of a spatial reference metric."}
 }];
 
+
+(* --- Embedded Kernel/RAYCovariantWarped.wl --- *)
+(* ::Package:: *)
+(* RAY warped product with an arbitrary coordinate-dependent base metric:
+   G_AB = g_ab(x),  G_ij = Exp[2 B(x)] h_ij(y).
+   Base d is explicitly coordinated (integer); fiber n can remain symbolic.
+   Independent geometric derivation from Levi-Civita formulas, RAY convention.
+   The external metric g_ab may itself contain A[t,x], off-diagonal terms,
+   and a nontrivial lapse or spatial curvature. No time-only assumption. *)
+
+Options[RAYCovariantWarpedMetric] = {
+ "IntrinsicGeometry" -> "General",
+ "Simplification" -> "Simplify",
+ Assumptions -> True
+};
+
+RAYCovariantWarpedMetric[name_String,coordinates_List,baseMetric_List,
+   n_,warp_,OptionsPattern[]] :=
+ Module[{d=Length[coordinates],ass=OptionValue[Assumptions],
+ mode=OptionValue["Simplification"],geometry=OptionValue["IntrinsicGeometry"],
+ simp,baseRic,baseR,ricFullBase,ginv,baseGamma,gradient,hess,box,grad2,
+ curvBase,curvInt,curvTensor,refMetric,warpCoefficient,
+ metricInverse,baseEinstein,scalar,curv,computed,spatialRic,
+ xx,yy},
+ If[d<2 || Dimensions[baseMetric]=!={d,d},
+  Return[rayFail["RAYCovariantWarpedMetric: base coordinates and metric matrix dimensions must agree, with d>=2."]]];
+ If[NumericQ[n] && (!IntegerQ[n] || n<1),
+  Return[rayFail["RAYCovariantWarpedMetric: n must be a positive integer or symbolic."]]];
+ If[!FreeQ[warp,_RAYTensor|_RAYNabla|_RAYPartialD],
+  Return[rayFail["RAYCovariantWarpedMetric: the warp factor must be a coordinate expression, not an abstract tensor."]]];
+ If[!FreeQ[baseMetric,Indeterminate|ComplexInfinity],
+  Return[rayFail["RAYCovariantWarpedMetric: invalid base metric components."]]];
+ simp=Switch[mode,
+  "None", Function[v,v],
+  "Full",Function[v,FullSimplify[v,ass]],
+  _,Function[v,Simplify[v,ass]]];
+ computed=RAYDefineMetric[name,coordinates,baseMetric,
+    Assumptions->ass,"Simplification"->mode];
+ If[computed===$Failed,Return[$Failed]];
+ baseRic=RAYRaw["Ricci","dd"];
+ baseR=RAYRaw["RicciScalar"];
+ ginv=RAYRaw["Metric","uu"];
+ baseGamma=rayGamma[];
+ gradient=Table[D[warp,coordinates[[a]]],{a,d}];
+ hess=Table[
+   D[warp,coordinates[[a]],coordinates[[b]]]-
+    Sum[baseGamma[[c,a,b]] gradient[[c]],{c,d}],
+   {a,d},{b,d}];
+ box=simp[Tr[ginv.hess]];
+ grad2=simp[gradient.ginv.gradient];
+ hess=Map[simp,hess,{2}];
+ curv=rayWarpGeometry[geometry,n,"Fiber"];
+ If[curv===$Failed,
+  Return[rayFail["RAYCovariantWarpedMetric: invalid intrinsic reference geometry."]]];
+ curvInt=curv[[1]];
+ curvTensor=curv[[2]];
+ refMetric=curv[[3]];
+ warpCoefficient=simp[box+n grad2];
+ ricFullBase=Map[simp,baseRic-n(hess+Outer[Times,gradient,gradient]),{2}];
+ scalar=simp[baseR+Exp[-2warp]curvInt-2n box-n(n+1)grad2];
+ baseEinstein=Map[simp,ricFullBase-1/2 scalar baseMetric,{2}];
+ spatialRic=simp[curvTensor-Exp[2warp]warpCoefficient refMetric];
+ <|"Type"->"CovariantWarpedProduct",
+  "Name"->name,"Coordinates"->coordinates,
+  "BaseDimension"->d,"FiberDimension"->n,
+  "TotalDimension"->d+n,"BaseMetric"->baseMetric,
+  "InverseBaseMetric"->ginv,
+  "Warp"->warp,
+  "IntrinsicGeometry"->geometry,
+  "IntrinsicRicciScalar"->curvInt,
+  "IntrinsicRicciTensor"->curvTensor,
+  "FiberReferenceMetric"->refMetric,
+  "BaseRicciTensor"->baseRic,
+  "BaseRicciScalar"->baseR,
+  "WarpPartialDerivative"->gradient,
+  "WarpCovariantHessian"->hess,
+  "WarpCovariantLaplacian"->box,
+  "WarpGradientSquared"->grad2,
+  "FullBaseRicciTensor"->ricFullBase,
+  "FullFiberRicciTensor"->spatialRic,
+  "FullRicciScalar"->scalar,
+  "FullBaseEinsteinTensor"->baseEinstein,
+  "FullFiberEinsteinTensor"->simp[curvTensor-
+      Exp[2warp](warpCoefficient+scalar/2)refMetric],
+  "Assumptions"->ass|>
+];
+
+(* These are actual covariant components in the supplied base coordinates,
+   while RAYPartialD is an unevaluated coordinate derivative marker.
+   RAYNabla denotes an abstract covariant derivative, not a partial. *)
+RAYPartialD[expression_Plus,index_] := Map[RAYPartialD[#,index]&,expression];
+RAYPartialD[expression_?NumericQ,index_] := 0;
+
+
+(* Deliberately do NOT overwrite the formal RAYNabla algebra or assert
+   partial=covariant for non-scalar tensors. A scalar first derivative
+   coincides only by evaluation using D[scalar,x]. *)
+
+RAYCovariantWarpedReport[model_Association] /;
+ Lookup[model,"Type",None]==="CovariantWarpedProduct" :=
+ Column[{
+   Style["General coordinate-dependent warped product",Bold,16],
+   Grid[{
+      {"Total dimension",model["TotalDimension"]},
+      {"Covariant Hessian",RAYReadable[model["WarpCovariantHessian"]]},
+      {"Covariant Laplacian",RAYReadable[model["WarpCovariantLaplacian"]]},
+      {"Gradient norm",RAYReadable[model["WarpGradientSquared"]]},
+      {"Ricci scalar",RAYReadable[model["FullRicciScalar"]]}
+   },Frame->All,Alignment->Left],
+   Style["Ricci tensor blocks",Bold,14],
+   MatrixForm[model["FullBaseRicciTensor"]],
+   RAYReadable[model["FullFiberRicciTensor"]]
+ }];
+
+
+(* Abstract base dimension d and fiber n may BOTH remain symbolic.
+   These are mathematically defined formal covariant operators, not ordinary
+   partial differentiation. They do not accidentally evaluate into D[]. *)
+RAYAbstractWarpedCurvature[d_,n_,warp_] := Module[
+ {a=RAYDown["a"],b=RAYDown["b"],
+  gb=RAYTensor["BaseMetric",{RAYDown["a"],RAYDown["b"]}],
+  gf=RAYTensor["FiberMetric",{RAYDown["i"],RAYDown["j"]}],
+  rb=RAYTensor["BaseRicci",{RAYDown["a"],RAYDown["b"]}],
+  rf=RAYTensor["FiberRicci",{RAYDown["i"],RAYDown["j"]}],
+  lap=RAYCovariantBox[warp],norm=RAYGradientNorm[warp],
+  baseScalar=RAYIntrinsicScalar["Base"],
+  fiberScalar=RAYIntrinsicScalar["Fiber"]},
+ <|"Type"->"AbstractCovariantWarpedProduct",
+   "BaseDimension"->d,"FiberDimension"->n,"TotalDimension"->d+n,
+   "BaseMetric"->gb,"FiberMetric"->gf,
+   "RicciBaseTensor"->rb-n(
+     RAYCovariantHessian[warp,a,b]+
+     RAYPartialD[warp,"a"] RAYPartialD[warp,"b"]),
+   "RicciFiberTensor"->rf-Exp[2warp](lap+n norm)gf,
+   "RicciScalar"->baseScalar+Exp[-2warp]fiberScalar-
+     2n lap-n(n+1)norm,
+   "CovariantLaplacian"->lap,"GradientSquared"->norm|>
+];
+
+(* Exact Weyl rescaling of a dimension-d base metric:
+   g'_ab = Exp[2 omega]g_ab, all geometric derivatives use g.
+   No identification of tensorial nabla_a nabla_b with partial_a partial_b. *)
+RAYWeylRescale[d_,omega_] := Module[
+ {g=RAYTensor["BaseMetric",{RAYDown["a"],RAYDown["b"]}],
+  r=RAYTensor["BaseRicci",{RAYDown["a"],RAYDown["b"]}],
+  h=RAYCovariantHessian[omega,RAYDown["a"],RAYDown["b"]],
+  box=RAYCovariantBox[omega],grad=RAYGradientNorm[omega],
+  v=RAYPartialD[omega,"a"] RAYPartialD[omega,"b"]},
+ <|"Type"->"WeylRescaling",
+   "Dimension"->d,"ConformalFactor"->Exp[2omega],
+   "RicciTensor"->r-(d-2)h-g box+
+     (d-2)(v-g grad),
+   "RicciScalar"->Exp[-2omega](
+     RAYIntrinsicScalar["Base"]-
+     2(d-1)box-(d-1)(d-2)grad),
+   "CovariantHessian"->h,
+   "CovariantLaplacian"->box,
+   "GradientSquared"->grad|>
+];
+
+
+$rayHelpRows=Join[$rayHelpRows,{
+ {"RAYCovariantWarpedMetric[name,coords,g,n,B]","Exact warped Ricci from a coordinate-dependent base g_ab(x), with arbitrary symbolic fiber n and covariant Hessian."},
+ {"RAYCovariantWarpedReport[model]","Readable coordinate-based warped Ricci/Hessian report."},
+ {"RAYPartialD[expr,index]","Formal coordinate partial derivative, distinct from RAYNabla."},
+ {"RAYAbstractWarpedCurvature[d,n,B]","Exact covariant warped Ricci formulas with both d and n symbolic and abstract base curvature."},
+ {"RAYWeylRescale[d,omega]","Exact d-dimensional conformal transformation of Ricci tensor/scalar using base covariant derivatives."}
+}];
 
 End[];
 
