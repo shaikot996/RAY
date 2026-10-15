@@ -119,8 +119,8 @@ RAYCanonicalize[expr_] := Module[{expanded=Expand[expr],terms},
 ];
 
 RAYIndexCheck[expr_] := Module[{terms,perTerm,indices,groups,invalid},
-  terms=rayAbsFactors[Expand[expr]];
-  If[Head[Expand[expr]]===Plus,terms=List@@Expand[expr]];
+  terms=If[Head[Expand[expr]]===Plus,
+    List@@Expand[expr],{Expand[expr]}];
   perTerm=Table[
     indices=Join[Cases[term,RAYUp[x_]:>{x,1},Infinity],
       Cases[term,RAYDown[x_]:>{x,-1},Infinity]];
