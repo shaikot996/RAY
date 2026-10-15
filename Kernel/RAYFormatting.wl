@@ -20,6 +20,7 @@ rayPrettyTensorName[name_String] := Switch[name,
   _, name
 ];
 
+rayPrettyIndexBoxes[index_String,form_] := index;
 rayPrettyIndexBoxes[index_,form_] := MakeBoxes[index,form];
 
 rayPrettyScript[indices_List,form_] := Module[
@@ -78,7 +79,7 @@ RAYDown /: MakeBoxes[RAYDown[index_],
 rayPrettyNablaBoxes[index_,expression_,form_] := Module[
  {label,indexBox,derivative,exprBox},
  label=If[MatchQ[index,RAYUp[_]|RAYDown[_]],First[index],index];
- indexBox=With[{heldLabel=label},MakeBoxes[heldLabel,form]];
+ indexBox=rayPrettyIndexBoxes[label,form];
  derivative=Which[
    MatchQ[index,_RAYDown],SubscriptBox["\[Del]",indexBox],
    MatchQ[index,_RAYUp],SuperscriptBox["\[Del]",indexBox],
