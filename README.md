@@ -1,6 +1,6 @@
 # RAY — Relativity and Geometry Toolkit
 
-> **Version 1.1.0 — extended development release.**  
+> **Version 1.1.1 — notebook presentation update.**  
 > **RAY is under active development.** APIs, performance characteristics, and higher-level abstractions may evolve as the package grows.
 
 **RAY** is a Wolfram Language package for explicit-component tensor geometry, general relativity, and Raychaudhuri kinematics.
@@ -519,7 +519,7 @@ The metric itself carries the signature; RAY does not hard-code mostly-plus or m
 
 ## Development status
 
-**RAY 1.1.0 adds matter variations, numerical workflows, and an initial abstract-index algebra layer.**
+**RAY 1.1.1 includes matter variations, numerical workflows, and an initial abstract-index algebra layer.**
 
 The current release is intended to provide a clean explicit-component foundation. The project is actively evolving, and the present API should be regarded as usable but not yet frozen.
 
@@ -655,7 +655,7 @@ RAY is released under the **MIT License**. See [`LICENSE`](LICENSE).
 
 ## Project status
 
-**Version:** 1.1.0  
+**Version:** 1.1.1  
 **Status:** under active development  
 **Language:** Wolfram Language  
 **Primary focus:** explicit-component tensor geometry, general relativity, and Raychaudhuri kinematics
