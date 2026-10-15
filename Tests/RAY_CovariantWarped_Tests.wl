@@ -1,0 +1,147 @@
+Needs["RAY`"];
+ClearAll[d,n,t,x,y,z,A,B,S,L,omega,mod,modFlat,modSphere,
+ baseRic,baseGamma,grad,hess,tests,rep];
+gBase=DiagonalMatrix[{-Exp[S[t]],Exp[2A[t,x]]}];
+
+mod=RAYCovariantWarpedMetric["CovariantBase",{t,x},gBase,n,B[t,x],
+ "IntrinsicGeometry"->"General"];
+baseRic=RAYRaw["Ricci","dd"];
+baseGamma=RAY`Private`rayGamma[];
+grad=mod["WarpPartialDerivative"];
+hess=mod["WarpCovariantHessian"];
+modFlat=RAYCovariantWarpedMetric["CovariantFlat",{t,x},gBase,n,B[t,x],
+ "IntrinsicGeometry"->"Flat"];
+modSphere=RAYCovariantWarpedMetric["CovariantSphere",{t,x},gBase,2,B[t,x],
+ "IntrinsicGeometry"->{"ConstantCurvature",1}];
+
+tests={
+ VerificationTest[RAYVersion,"1.2.1",TestID->"version"],
+ VerificationTest[Quiet[RAYGeneralWarpedMetric[d,n,A[t,x],B[t],"Time"->t]],
+  $Failed,TestID->"reject-multivariable-A"],
+ VerificationTest[Quiet[RAYGeneralWarpedMetric[d,n,A[t],B[t,x],"Time"->t]],
+  $Failed,TestID->"reject-multivariable-B"],
+ VerificationTest[Quiet[RAYGeneralWarpedMetric[d,n,A[t],B[t],"Time"->t,
+   "Lapse"->L[t,x]]],$Failed,TestID->"reject-multivariable-lapse"],
+ VerificationTest[AssociationQ[RAYGeneralWarpedMetric[d,n,A[t],B[t],
+   "Time"->t]],True,TestID->"accept-time-only"],
+ VerificationTest[AssociationQ[mod],True,TestID->"coordinate-base-association"],
+ VerificationTest[mod["TotalDimension"],n+2,TestID->"symbolic-n"],
+ VerificationTest[Dimensions[mod["WarpCovariantHessian"]],{2,2},
+  TestID->"covariant-Hessian-shape"],
+ VerificationTest[mod["WarpPartialDerivative"],
+  {Derivative[1,0][B][t,x],Derivative[0,1][B][t,x]},
+  TestID->"true-partial-gradient"],
+ VerificationTest[FullSimplify[mod["BaseRicciTensor"]-baseRic],
+  ConstantArray[0,{2,2}],TestID->"base-Ricci-preserved"],
+ VerificationTest[FullSimplify[hess-Transpose[hess]],
+  ConstantArray[0,{2,2}],TestID->"Hessian-symmetric"],
+ VerificationTest[FullSimplify[hess-Table[
+  D[B[t,x],{t,x}[[i]],{t,x}[[j]]]-
+    Sum[baseGamma[[k,i,j]]grad[[k]],{k,2}],
+     {i,2},{j,2}]],ConstantArray[0,{2,2}],
+  TestID->"Hessian-connection"],
+ VerificationTest[FullSimplify[hess[[1,2]]-D[B[t,x],t,x]],
+  -Derivative[1,0][A][t,x]Derivative[0,1][B][t,x],
+  TestID->"partial-is-not-covariant"],
+ VerificationTest[FullSimplify[mod["WarpCovariantLaplacian"]-
+   Tr[mod["InverseBaseMetric"].hess]],0,
+  TestID->"covariant-laplacian"],
+ VerificationTest[FullSimplify[mod["WarpGradientSquared"]-
+   grad.mod["InverseBaseMetric"].grad],0,
+  TestID->"gradient-norm"],
+ VerificationTest[FullSimplify[
+   mod["FullRicciScalar"]-mod["BaseRicciScalar"]-
+   Exp[-2 B[t,x]] RAYIntrinsicScalar["Fiber"]+
+   2n mod["WarpCovariantLaplacian"]+
+   n(n+1)mod["WarpGradientSquared"]],0,
+   TestID->"full-warp-scalar-identity"],
+ VerificationTest[!TrueQ[FullSimplify[
+   mod["FullBaseRicciTensor"][[1,2]]==0]],True,
+  TestID->"mixed-Ricci-not-ignored"],
+ VerificationTest[!FreeQ[mod["FullFiberRicciTensor"],
+    RAYTensor["FiberRicci",{RAYDown["i"],RAYDown["j"]}]],
+   True,TestID->"arbitrary-intrinsic-Ricci"],
+ VerificationTest[modSphere["IntrinsicRicciScalar"],2,
+  TestID->"constant-curvature-sphere"],
+ VerificationTest[RAYAbstractWarpedCurvature[d,n,B[t,x]]["TotalDimension"],
+  d+n,TestID->"abstract-both-dimensions"],
+ VerificationTest[!FreeQ[RAYAbstractWarpedCurvature[d,n,B[t,x]]["RicciBaseTensor"],
+  _RAYCovariantHessian],True,TestID->"abstract-Hessian"],
+ VerificationTest[!FreeQ[RAYWeylRescale[d,omega[t,x]]["RicciTensor"],
+  _RAYCovariantHessian],True,TestID->"Weyl-covariant-Hessian"],
+ VerificationTest[!FreeQ[ToBoxes[RAYTensor["InternalRicci",
+   {RAYDown["i"],RAYDown["j"]}],StandardForm],_OverscriptBox],
+  True,TestID->"intrinsic-Ricci-tilde"],
+ VerificationTest[!FreeQ[ToBoxes[RAYIntrinsicScalar["Internal"],
+   StandardForm],_OverscriptBox],True,TestID->"intrinsic-scalar-tilde"],
+ VerificationTest[!FreeQ[ToBoxes[RAYPartialD[B[t,x],x],StandardForm],
+   SubscriptBox["\[PartialD]",_]],True,TestID->"partial-notation"],
+ VerificationTest[!FreeQ[ToBoxes[RAYNabla[RAYDown[x],B[t,x]],
+   StandardForm],SubscriptBox["\[Del]",_]],
+  True,TestID->"covariant-notation"],
+ VerificationTest[!SameQ[ToBoxes[RAYPartialD[B[t,x],x],StandardForm],
+   ToBoxes[RAYNabla[RAYDown[x],B[t,x]],StandardForm]],
+  True,TestID->"operators-visibly-distinct"],
+ VerificationTest[!FreeQ[ToBoxes[RAYReadable[Derivative[1,0][B][t,x]],
+   StandardForm],TagBox[_FractionBox,"InactiveDTraditional",___]],
+  True,TestID->"partial-default"],
+ VerificationTest[!FreeQ[ToBoxes[RAYReadable[A'[t],
+   "DerivativeNotation"->"Dot"],StandardForm],
+   OverscriptBox["A","."]],True,TestID->"dot-opt-in"],
+ VerificationTest[SameQ[ToExpression[
+    ToBoxes[RAYIntrinsicScalar["Internal"],StandardForm],
+    StandardForm],RAYIntrinsicScalar["Internal"]],
+   True,TestID->"intrinsic-roundtrip"],
+ VerificationTest[SameQ[ToExpression[
+    ToBoxes[RAYCovariantBox[B[t,x]],StandardForm],StandardForm],
+    RAYCovariantBox[B[t,x]]],True,TestID->"box-roundtrip"]
+};
+
+RAYDefineMetric["FullWarp3D",{t,x,y},
+ DiagonalMatrix[{-Exp[S[t]],Exp[2A[t,x]],Exp[2B[t,x]]}]];
+full3Ric=RAYRaw["Ricci","dd"];
+full3Sc=RAYRaw["RicciScalar"];
+AppendTo[tests,VerificationTest[
+ FullSimplify[full3Sc-(modFlat["FullRicciScalar"]/.n->1)],
+ 0,TestID->"3D-full-scalar"]];
+AppendTo[tests,VerificationTest[
+ FullSimplify[full3Ric[[1;;2,1;;2]]-
+  (modFlat["FullBaseRicciTensor"]/.n->1)],
+ ConstantArray[0,{2,2}],TestID->"3D-base-Ricci-block"]];
+AppendTo[tests,VerificationTest[
+ FullSimplify[full3Ric[[3,3]]-
+  ((modFlat["FullFiberRicciTensor"]/.n->1)/.
+   RAYTensor["FiberMetric",{RAYDown["i"],RAYDown["j"]}]->1)],
+ 0,TestID->"3D-fiber-Ricci-block"]];
+
+RAYDefineMetric["FullWarpSphere4D",{t,x,y,z},
+ DiagonalMatrix[{-Exp[S[t]],Exp[2A[t,x]],
+  Exp[2B[t,x]],Exp[2B[t,x]]Sin[y]^2}],
+ Assumptions->0<y<Pi];
+full4Ric=RAYRaw["Ricci","dd"];
+full4Sc=RAYRaw["RicciScalar"];
+AppendTo[tests,VerificationTest[
+ FullSimplify[full4Sc-modSphere["FullRicciScalar"],
+  Assumptions->0<y<Pi],0,TestID->"4D-sphere-full-scalar"]];
+AppendTo[tests,VerificationTest[
+ FullSimplify[full4Ric[[1;;2,1;;2]]-
+   modSphere["FullBaseRicciTensor"],Assumptions->0<y<Pi],
+ ConstantArray[0,{2,2}],TestID->"4D-sphere-full-base-Ricci"]];
+fc=1-Exp[2B[t,x]](modSphere["WarpCovariantLaplacian"]+
+  2modSphere["WarpGradientSquared"]);
+AppendTo[tests,VerificationTest[
+ FullSimplify[full4Ric[[3,3]]-fc,Assumptions->0<y<Pi],
+ 0,TestID->"4D-sphere-fiber-y"]];
+AppendTo[tests,VerificationTest[
+ FullSimplify[full4Ric[[4,4]]-fc Sin[y]^2,
+  Assumptions->0<y<Pi],0,TestID->"4D-sphere-fiber-z"]];
+AppendTo[tests,VerificationTest[
+ FullSimplify[full4Ric[[1;;2,3;;4]],Assumptions->0<y<Pi],
+ ConstantArray[0,{2,2}],TestID->"4D-mixed-base-fiber"]];
+
+rep=TestReport[tests];
+covSummary=<|"Total"->Length[tests],
+ "Pass"->Length[rep[[1]]["TestsSucceededKeys"]],
+ "Wrong"->Length[rep[[1]]["TestsFailedWrongResultsKeys"]],
+ "Messages"->Length[rep[[1]]["TestsFailedWithMessagesKeys"]]|>;
+covSummary
