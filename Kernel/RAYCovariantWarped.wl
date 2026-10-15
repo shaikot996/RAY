@@ -16,7 +16,7 @@ RAYCovariantWarpedMetric[name_String,coordinates_List,baseMetric_List,
    n_,warp_,OptionsPattern[]] :=
  Module[{d=Length[coordinates],ass=OptionValue[Assumptions],
  mode=OptionValue["Simplification"],geometry=OptionValue["IntrinsicGeometry"],
- simp,baseRic,baseR,ginv,baseGamma,gradient,hess,box,grad2,
+ simp,baseRic,baseR,ricFullBase,ginv,baseGamma,gradient,hess,box,grad2,
  curvBase,curvInt,curvTensor,refMetric,warpCoefficient,
  metricInverse,baseEinstein,scalar,curv,computed,spatialRic,
  xx,yy},
@@ -38,7 +38,7 @@ RAYCovariantWarpedMetric[name_String,coordinates_List,baseMetric_List,
  baseRic=RAYRaw["Ricci","dd"];
  baseR=RAYRaw["RicciScalar"];
  ginv=RAYRaw["Metric","uu"];
- baseGamma=RAYRaw["Christoffel"];
+ baseGamma=rayGamma[];
  gradient=Table[D[warp,coordinates[[a]]],{a,d}];
  hess=Table[
    D[warp,coordinates[[a]],coordinates[[b]]]-
@@ -54,9 +54,9 @@ RAYCovariantWarpedMetric[name_String,coordinates_List,baseMetric_List,
  curvTensor=curv[[2]];
  refMetric=curv[[3]];
  warpCoefficient=simp[box+n grad2];
- baseRic=simp/@(baseRic-n(hess+Outer[Times,gradient,gradient]));
+ ricFullBase=Map[simp,baseRic-n(hess+Outer[Times,gradient,gradient]),{2}];
  scalar=simp[baseR+Exp[-2warp]curvInt-2n box-n(n+1)grad2];
- baseEinstein=Map[simp,baseRic-1/2 scalar baseMetric,{2}];
+ baseEinstein=Map[simp,ricFullBase-1/2 scalar baseMetric,{2}];
  spatialRic=simp[curvTensor-Exp[2warp]warpCoefficient refMetric];
  <|"Type"->"CovariantWarpedProduct",
   "Name"->name,"Coordinates"->coordinates,
@@ -74,7 +74,7 @@ RAYCovariantWarpedMetric[name_String,coordinates_List,baseMetric_List,
   "WarpCovariantHessian"->hess,
   "WarpCovariantLaplacian"->box,
   "WarpGradientSquared"->grad2,
-  "FullBaseRicciTensor"->baseRic,
+  "FullBaseRicciTensor"->ricFullBase,
   "FullFiberRicciTensor"->spatialRic,
   "FullRicciScalar"->scalar,
   "FullBaseEinsteinTensor"->baseEinstein,
@@ -106,7 +106,7 @@ RAYCovariantWarpedReport[model_Association] /;
       {"Ricci scalar",RAYReadable[model["FullRicciScalar"]]}
    },Frame->All,Alignment->Left],
    Style["Ricci tensor blocks",Bold,14],
-   RAYReadable[model["FullBaseRicciTensor"]] // MatrixForm,
+   MatrixForm[model["FullBaseRicciTensor"]],
    RAYReadable[model["FullFiberRicciTensor"]]
  }];
 
