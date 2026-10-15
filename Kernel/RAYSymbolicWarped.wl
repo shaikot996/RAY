@@ -38,6 +38,18 @@ rayWarpTime[specs_,lapse_,time_] := Module[{candidates},
  If[Length[candidates]===1,First[candidates],$Failed]
 ];
 
+
+(* The symbolic Hubble-block formulas assume that each warp is a function
+   of the common time alone. Reject multivariable coordinate-dependent
+   functions instead of silently dropping their spatial gradients.
+   Bare symbols are parameters unless users supply separate coordinates. *)
+rayWarpTimeOnlyQ[warp_,time_Symbol] := Module[{functions},
+ functions=Cases[HoldComplete[warp],
+   HoldPattern[f_Symbol[args___]] /; Context[f]=!="System\`" :>
+     HoldComplete[args],Infinity];
+ AllTrue[functions,MatchQ[#,HoldComplete[time]]&]
+];
+
 RAYWarpedBlocks[specs_List,OptionsPattern[]] := Module[
  {time,lapse=OptionValue["Lapse"],ass=OptionValue["Assumptions"],
   mode=OptionValue["Simplification"],simple,geom,dimensions,warps,
@@ -55,6 +67,11 @@ RAYWarpedBlocks[specs_List,OptionsPattern[]] := Module[
  time=rayWarpTime[specs,lapse,OptionValue["Time"]];
  If[time===$Failed,
    Return[rayFail["RAYWarpedBlocks: specify \"Time\"->t or use a single time variable in all warps."]]];
+ If[!AllTrue[warps,rayWarpTimeOnlyQ[#,time]&] ||
+   !rayWarpTimeOnlyQ[lapse,time],
+  Return[rayFail[
+   "RAYWarpedBlocks: warp factors and lapse must depend on time only. For A[t,x] or B[t,x], use RAYCovariantWarpedMetric with a coordinate-dependent base metric; the time-only Ricci formulas would omit spatial gradients."
+  ]]];
  geom=Map[rayWarpGeometry[#[[4]],#[[2]],#[[1]]]&,specs];
  If[MemberQ[geom,$Failed],
    Return[rayFail["RAYWarpedBlocks: geometry must be Flat, General, {General,R}, {Einstein,lambda}, or {ConstantCurvature,K}."]]];
