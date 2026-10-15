@@ -213,7 +213,7 @@ RAYRegisterTensor::usage = "RAYRegisterTensor[name,array,config] registers expli
 
 RAYUnregisterTensor::usage = "RAYUnregisterTensor[name] removes a user-defined component tensor from the active metric.";
 
-RAW::usage = "expr // RAW shows normal Mathematica notebook input syntax (StandardForm), including f\u0027[t], and unwraps large RAY tensor displays into raw arrays. Use RAYRaw[...] to obtain algebra-ready arrays.";
+RAW::usage = "expr // RAW shows normal Mathematica notebook input syntax (StandardForm), including f'[t], and unwraps large RAY tensor displays into raw arrays. Use RAYRaw[...] to obtain algebra-ready arrays.";
 
 RAYPretty::usage = "expr // RAYPretty shows handwritten math, dot time derivatives and conventional partial derivative fractions. The underlying algebra is unchanged.";
 
