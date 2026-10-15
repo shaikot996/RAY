@@ -115,21 +115,61 @@ RAYPlot[solution_Association,quantities_:Automatic,OptionsPattern[]] :=
 
 (* Front-end dialog with editable Expression input fields.
    Use RAYSolve directly in headless environments. *)
+(* Guided three-step front-end dialog. Its NDSolve backend is RAYSolve. *)
 RAYSolveWizard[equations_List,fields_List,domain:{_Symbol,_,_}] :=
  DialogInput[
-  DynamicModule[{ics={},makePlot=True,selection=Automatic},
+  DynamicModule[
+   {step=1,ics={},makePlot=True,selection=Automatic,
+    colors=Automatic,lines=Automatic,
+    frame=True,frameLabels=Automatic,plotTitle=None,
+    preview=False},
    Column[{
-     Style["RAY numerical solver",Bold,16],
-     "Enter one IC list, or a list of IC lists to compare:",
-     InputField[Dynamic[ics],Expression,FieldSize->{55,5}],
-     Row[{Checkbox[Dynamic[makePlot]]," Plot after solving"}],
-     Row[{"Quantities to plot (Automatic = dependent fields): ",
-       InputField[Dynamic[selection],Expression,FieldSize->30]}],
+     Style["RAY numerical solver",Bold,17],
+     Dynamic@Style["Step "<>ToString[step]<>" of 3",Bold,13],
+     PaneSelector[{
+       1->Column[{
+         Style["Initial conditions",Bold],
+         "One list for a single solution; nested lists for several IC sets.",
+         InputField[Dynamic[ics],Expression,FieldSize->{58,5}],
+         Style["Example: {{u[0]==0,u'[0]==1},{u[0]==1,u'[0]==0}}",
+           Italic,Gray]
+       }],
+       2->Column[{
+         Style["Quantities and output",Bold],
+         Row[{Checkbox[Dynamic[makePlot]]," Produce solution plots"}],
+         "Choose expressions to plot or Automatic for all dependent fields:",
+         InputField[Dynamic[selection],Expression,FieldSize->48],
+         "You can pass u[t], u'[t] or several quantities as a list."
+       }],
+       3->Column[{
+         Style["Plot appearance",Bold],
+         "Colors (Automatic or list):",
+         InputField[Dynamic[colors],Expression,FieldSize->40],
+         "Line patterns for IC sets (Automatic or list):",
+         InputField[Dynamic[lines],Expression,FieldSize->40],
+         Row[{Checkbox[Dynamic[frame]]," Show frame"}],
+         "Frame labels (Automatic or {horizontal,vertical}):",
+         InputField[Dynamic[frameLabels],Expression,FieldSize->40],
+         "Plot title:",
+         InputField[Dynamic[plotTitle],Expression,FieldSize->40]
+       }]
+     },Dynamic[step]],
      Row[{
-       DefaultButton[DialogReturn[RAYSolve[equations,fields,domain,ics,
-         "Plot"->makePlot,"PlotFields"->selection]]],
-       CancelButton[]
-     }]
-   },Spacings->1.2]
+       Button["Previous",step=Max[1,step-1],Enabled->Dynamic[step>1]],
+       Button["Next",step=Min[3,step+1],Enabled->Dynamic[step<3]],
+       Spacer[10],
+       Button["Solve",DialogReturn[
+         RAYSolve[equations,fields,domain,ics,
+           "Plot"->makePlot,
+           "PlotFields"->selection,
+           "PlotOptions"->{
+             "Colors"->colors,"LineStyles"->lines,
+             "Frame"->frame,"FrameLabel"->frameLabels,
+             "PlotLabel"->plotTitle
+           }]
+         ],Enabled->Dynamic[step===3]],
+       Button["Cancel",DialogReturn[$Canceled]]
+     },Spacer[8]]
+   },Spacings->1.3]
   ]
  ];
