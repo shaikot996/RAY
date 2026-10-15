@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.1 — 2026-10-15
+
+- Prevent the time-only symbolic warp API from silently discarding x-dependence, including A[t,x], A[t] Sin[x] and x-dependent lapse factors. Constant symbolic coefficients must be declared through the "Parameters" option.
+- Add exact covariant warped-product curvature for coordinate-dependent explicit base metrics with symbolic fiber dimensions.
+- Add abstract covariant d+n Ricci and Weyl rescaling formulas, keeping partial derivatives, covariant Hessians, Laplace-Beltrami and gradient norms distinct.
+- Improve intrinsic Ricci tilde notation; use partial derivative fractions by default, with optional time-dot display.
+- Independently cross-check full 3D/4D Ricci and a 3D Weyl transformation, together with all previous regression suites: 278/278 Wolfram tests pass.
+
+
+
 ## 1.2.0 — 2026-10-15
 
 - Introduce exact dimension-independent d+n time-warped Ricci/Einstein formulas with symbolic d,n.
