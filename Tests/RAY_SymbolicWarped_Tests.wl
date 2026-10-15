@@ -2,7 +2,7 @@
 (* Exact, executable v1.2.0 dimension-independent warped-geometry tests.
    Run with installed package, or load RAYStandalone.wl first. *)
 Needs["RAY`"];
-ClearAll[d,n,t,A,B,C,L,ke,ki,lambda,RI,RE,x1,x2,y1,y2,z1,
+ClearAll[d,n,t,A,B,Fwarp,L,ke,ki,lambda,RI,RE,x1,x2,y1,y2,z1,
   gwTest,gwLapse,gwGeneral,gwMulti,gwFlat,gwCurved,gwThree,gwReport,
   gwCases,gwCheck,gwTiming,gwSummary,gwReportTests];
 
@@ -28,7 +28,7 @@ gwMulti=RAYWarpedBlocks[
  {{"x",d-1,A[t],"Flat"},{"y",n,B[t],{"ConstantCurvature",ki}}},
  "Time"->t];
 gwThree=RAYWarpedBlocks[
- {{"x",1,A[t],"Flat"},{"y",2,B[t],"Flat"},{"z",n,C[t],"General"}},
+ {{"x",1,A[t],"Flat"},{"y",2,B[t],"Flat"},{"z",n,Fwarp[t],"General"}},
  "Time"->t];
 
 m=d-1;
@@ -143,13 +143,13 @@ gwCases={
    (2 A''[t]+4 B''[t]+2n C''[t]+
     (A'[t]+2 B'[t]+n C'[t])^2+
     A'[t]^2+2 B'[t]^2+n C'[t]^2+
-    Exp[-2C[t]] RAYIntrinsicScalar["z"])==0]]],
+    Exp[-2Fwarp[t]] RAYIntrinsicScalar["z"])==0]]],
  gwCheck["39-multi-block-three-Hamiltonian",
   TrueQ[FullSimplify[
    gwThree["EinsteinTimeTime"]-
    ((A'[t]+2 B'[t]+n C'[t])^2-
      A'[t]^2-2 B'[t]^2-n C'[t]^2+
-       Exp[-2C[t]]RAYIntrinsicScalar["z"])/2==0]]],
+       Exp[-2Fwarp[t]]RAYIntrinsicScalar["z"])/2==0]]],
  gwCheck["40-Einstein-reference-geometry",
   TrueQ[FullSimplify[
    RAYGeneralWarpedMetric[d,n,A[t],B[t],"Time"->t,
