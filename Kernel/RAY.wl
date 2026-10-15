@@ -209,6 +209,10 @@ RAYCovDCommutator::usage = "RAYCovDCommutator[tensor,a,b] forms [nabla_a,nabla_b
 
 RAYToComponents::usage = "RAYToComponents[expr,free] evaluates indexed tensors against the active explicit metric.";
 
+RAYRegisterTensor::usage = "RAYRegisterTensor[name,array,config] registers explicit components of a user-defined tensor for the active metric.";
+
+RAYUnregisterTensor::usage = "RAYUnregisterTensor[name] removes a user-defined component tensor from the active metric.";
+
 Begin["`Private`"];
 
 $RAYVersion = "1.0.0";
