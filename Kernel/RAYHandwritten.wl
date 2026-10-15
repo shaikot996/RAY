@@ -132,6 +132,60 @@ RAYEinstein[config_String] /; rayRequireMetric[]===True :=
 RAYRicciScalar[] /; rayRequireMetric[]===True :=
  RAYReadable[rayRicciScalar[]];
 
+
+(* Consistent readable boxes for every legacy MatrixForm result and all
+   sparse curvature/kinematic grids, not just Ricci and Einstein. *)
+rayDisplayMatrix[array_] := RAYHandwritten[MatrixForm[array]];
+rayDisplayVector[array_] := RAYHandwritten[array];
+
+rayNonzeroGrid[array_,cfg_List,symbol_,title_String] := Module[
+ {d=rayDim[],rank=Length[cfg],tuples,rows},
+ tuples=Tuples[Range[0,d-1],rank];
+ rows=Reap[Do[
+   With[{v=raySimp[rayComponent[array,inds]]},
+     If[!TrueQ[v===0] && !TrueQ[PossibleZeroQ[v]],
+       Sow[{rayIndexLabel[symbol,inds,cfg],RAYReadable[v]}]]],
+   {inds,tuples}]][[2]];
+ rows=If[rows==={}, {},First[rows]];
+ Column[{
+   Style[title,Bold,15],
+   If[rows==={},
+     Style["All components vanish.",Italic,13],
+     Grid[Prepend[rows,
+       {Style["Component",Bold],Style["Value",Bold]}],
+       Frame->All,Alignment->{{Center,Left}},
+       Spacings->{2,1},ItemSize->{{Automatic,UpTo[80]},Automatic}]
+   ]
+ },Spacings->0.8]
+];
+
+(* Component calls remain compact mathematical expressions; full matrices
+   remain accessible as MatrixForm[RAYRaw["Ricci","dd"]]. *)
+RAYRicci[config_String,mu_Integer,nu_Integer] /;
+ rayRequireMetric[]===True := Module[{data},
+  If[!rayValidIndexQ[mu] || !rayValidIndexQ[nu],Return[$Failed]];
+  data=rayTensorByName["Ricci",config];
+  If[data===$Failed,Return[$Failed]];
+  RAYReadable[data[[mu+1,nu+1]]]
+];
+
+RAYEinstein[config_String,mu_Integer,nu_Integer] /;
+ rayRequireMetric[]===True := Module[{data},
+  If[!rayValidIndexQ[mu] || !rayValidIndexQ[nu],Return[$Failed]];
+  data=rayTensorByName["Einstein",config];
+  If[data===$Failed,Return[$Failed]];
+  RAYReadable[data[[mu+1,nu+1]]]
+];
+
+(* Explicit opt-in to legacy full-matrix layout in handwritten notation. *)
+RAYRicci[config_String,"Matrix"] /;
+ rayRequireMetric[]===True :=
+  RAYHandwritten[MatrixForm[rayTensorByName["Ricci",config]]];
+RAYEinstein[config_String,"Matrix"] /;
+ rayRequireMetric[]===True :=
+  RAYHandwritten[MatrixForm[rayTensorByName["Einstein",config]]];
+
+
 (* Uniform handwritten presentation of scalar invariants. *)
 RAYKretschmann[] /; rayRequireMetric[]===True :=
  RAYReadable[rayKretschmann[]];
