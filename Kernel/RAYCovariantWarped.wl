@@ -110,8 +110,57 @@ RAYCovariantWarpedReport[model_Association] /;
    RAYReadable[model["FullFiberRicciTensor"]]
  }];
 
+
+(* Abstract base dimension d and fiber n may BOTH remain symbolic.
+   These are mathematically defined formal covariant operators, not ordinary
+   partial differentiation. They do not accidentally evaluate into D[]. *)
+RAYAbstractWarpedCurvature[d_,n_,warp_] := Module[
+ {a=RAYDown["a"],b=RAYDown["b"],
+  gb=RAYTensor["BaseMetric",{RAYDown["a"],RAYDown["b"]}],
+  gf=RAYTensor["FiberMetric",{RAYDown["i"],RAYDown["j"]}],
+  rb=RAYTensor["BaseRicci",{RAYDown["a"],RAYDown["b"]}],
+  rf=RAYTensor["FiberRicci",{RAYDown["i"],RAYDown["j"]}],
+  lap=RAYCovariantBox[warp],norm=RAYGradientNorm[warp],
+  baseScalar=RAYIntrinsicScalar["Base"],
+  fiberScalar=RAYIntrinsicScalar["Fiber"]},
+ <|"Type"->"AbstractCovariantWarpedProduct",
+   "BaseDimension"->d,"FiberDimension"->n,"TotalDimension"->d+n,
+   "BaseMetric"->gb,"FiberMetric"->gf,
+   "RicciBaseTensor"->rb-n(
+     RAYCovariantHessian[warp,a,b]+
+     RAYPartialD[warp,"a"] RAYPartialD[warp,"b"]),
+   "RicciFiberTensor"->rf-Exp[2warp](lap+n norm)gf,
+   "RicciScalar"->baseScalar+Exp[-2warp]fiberScalar-
+     2n lap-n(n+1)norm,
+   "CovariantLaplacian"->lap,"GradientSquared"->norm|>
+];
+
+(* Exact Weyl rescaling of a dimension-d base metric:
+   g'_ab = Exp[2 omega]g_ab, all geometric derivatives use g.
+   No identification of tensorial nabla_a nabla_b with partial_a partial_b. *)
+RAYWeylRescale[d_,omega_] := Module[
+ {g=RAYTensor["BaseMetric",{RAYDown["a"],RAYDown["b"]}],
+  r=RAYTensor["BaseRicci",{RAYDown["a"],RAYDown["b"]}],
+  h=RAYCovariantHessian[omega,RAYDown["a"],RAYDown["b"]],
+  box=RAYCovariantBox[omega],grad=RAYGradientNorm[omega],
+  v=RAYPartialD[omega,"a"] RAYPartialD[omega,"b"]},
+ <|"Type"->"WeylRescaling",
+   "Dimension"->d,"ConformalFactor"->Exp[2omega],
+   "RicciTensor"->r-(d-2)h-g box+
+     (d-2)(v-g grad),
+   "RicciScalar"->Exp[-2omega](
+     RAYIntrinsicScalar["Base"]-
+     2(d-1)box-(d-1)(d-2)grad),
+   "CovariantHessian"->h,
+   "CovariantLaplacian"->box,
+   "GradientSquared"->grad|>
+];
+
+
 $rayHelpRows=Join[$rayHelpRows,{
  {"RAYCovariantWarpedMetric[name,coords,g,n,B]","Exact warped Ricci from a coordinate-dependent base g_ab(x), with arbitrary symbolic fiber n and covariant Hessian."},
  {"RAYCovariantWarpedReport[model]","Readable coordinate-based warped Ricci/Hessian report."},
- {"RAYPartialD[expr,index]","Formal partial derivative (coordinate-based), distinct from RAYNabla covariant derivative."}
+ {"RAYPartialD[expr,index]","Formal coordinate partial derivative, distinct from RAYNabla."},
+ {"RAYAbstractWarpedCurvature[d,n,B]","Exact covariant warped Ricci formulas with both d and n symbolic and abstract base curvature."},
+ {"RAYWeylRescale[d,omega]","Exact d-dimensional conformal transformation of Ricci tensor/scalar using base covariant derivatives."}
 }];
