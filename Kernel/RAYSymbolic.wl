@@ -108,7 +108,7 @@ RAYAbstractCovD[expr_Times,mu_] := Module[{f=List@@expr},
  ];
 RAYAbstractCovD[expr_?NumericQ,mu_] := 0;
 RAYAbstractCovD[RAYTensor["Metric",_],mu_] := 0;
-RAYAbstractCovD[expr_,mu_] := RAYNabla[mu,expr];
+RAYAbstractCovD[expr_,mu_] := RAYNabla[If[Head[mu]===RAYDown,mu,RAYDown[mu]],expr];
 
 RAYConventions[] := Grid[
  {
