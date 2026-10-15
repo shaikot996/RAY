@@ -241,7 +241,75 @@ gwCases={
     Assumptions->L[t]>0]]],
  gwCheck["65-bridge-lapse-Einstein",
   TrueQ[FullSimplify[RAYRaw["Einstein","dd"][[1,1]]==
-    gwTest["EinsteinTimeTime"],Assumptions->L[t]>0]]]
+    gwTest["EinsteinTimeTime"],Assumptions->L[t]>0]]],
+ gwCheck["66-vacuum-field-equations-descriptor",
+   AssociationQ[RAYWarpedFieldEquations[gwFlat]]],
+ gwCheck["67-vacuum-field-equations-time",
+   TrueQ[FullSimplify[
+     RAYWarpedFieldEquations[gwFlat]["TimeTimeResidual"]==hamFlat]]],
+ gwCheck["68-vacuum-scalar-spatial-classification",
+   AllTrue[RAYWarpedFieldEquations[gwFlat]["Spatial"],
+     #["EquationType"]==="Scalar"&]],
+ gwCheck["69-general-internal-tensor-classification",
+   RAYWarpedFieldEquations[gwGeneral]["Spatial"][[2,"EquationType"]]==="FullTensor"],
+ gwCheck["70-internal-anisotropy-preserved",
+   !FreeQ[RAYWarpedFieldEquations[gwGeneral]["Spatial"][[2,"TensorResidual"]],
+     RAYTensor["InternalRicci",{RAYDown["i"],RAYDown["j"]}]]],
+ gwCheck["71-vacuum-Lambda-time-sign",
+   TrueQ[FullSimplify[
+     RAYWarpedFieldEquations[gwFlat,Automatic,
+       "CosmologicalConstant"->lambda]["TimeTimeResidual"]==
+       hamFlat-lambda]]],
+ gwCheck["72-vacuum-Lambda-spatial-sign",
+   TrueQ[FullSimplify[
+     RAYWarpedFieldEquations[gwFlat,Automatic,
+       "CosmologicalConstant"->lambda]["Spatial"][[1,"Residual"]]-
+       gwFlat["Blocks"][[1,"EinsteinCoefficient"]]-lambda==0]]],
+ gwCheck["73-homogeneous-fluid-energy",
+   TrueQ[FullSimplify[
+     RAYWarpedFieldEquations[gwFlat,
+       <|"EnergyDensity"->RI|>,"Coupling"->ke]["TimeTimeResidual"]-
+       (hamFlat-ke RI)==0]]],
+ gwCheck["74-homogeneous-fluid-pressure-external",
+   TrueQ[FullSimplify[
+     RAYWarpedFieldEquations[gwFlat,
+       <|"Pressures"->{RE,RI}|>,"Coupling"->ke]["Spatial"][[1,"Residual"]]-
+       (gwFlat["Blocks"][[1,"EinsteinCoefficient"]]-ke RE)==0]]],
+ gwCheck["75-homogeneous-fluid-pressure-internal",
+   TrueQ[FullSimplify[
+     RAYWarpedFieldEquations[gwFlat,
+       <|"Pressures"->{RE,RI}|>,"Coupling"->ke]["Spatial"][[2,"Residual"]]-
+       (gwFlat["Blocks"][[2,"EinsteinCoefficient"]]-ke RI)==0]]],
+ gwCheck["76-named-fluid-pressures",
+   TrueQ[FullSimplify[
+     RAYWarpedFieldEquations[gwFlat,
+       <|"Pressures"-><|"External"->RE,"Internal"->RI|>|>,
+       "Coupling"->ke]["Spatial"][[2,"Residual"]]-
+       (gwFlat["Blocks"][[2,"EinsteinCoefficient"]]-ke RI)==0]]],
+ gwCheck["77-pressure-missing-rejected",
+   Quiet[RAYWarpedFieldEquations[gwFlat,
+     <|"Pressures"-><|"External"->RE|>|>]]===$Failed],
+ gwCheck["78-pressure-count-rejected",
+   Quiet[RAYWarpedFieldEquations[gwFlat,
+     <|"Pressures"->{RE}|>]]===$Failed],
+ gwCheck["79-non-association-source-rejected",
+   Quiet[RAYWarpedFieldEquations[gwFlat,{RE,RI}]]===$Failed],
+ gwCheck["80-lapse-fluid-time",
+   TrueQ[FullSimplify[
+     RAYWarpedFieldEquations[gwLapse,
+       <|"EnergyDensity"->RI|>,
+       "Coupling"->ke,"CosmologicalConstant"->lambda
+     ]["TimeTimeResidual"]-
+     (gwLapse["EinsteinTimeTime"]-L[t]^2(lambda+ke RI))==0]]],
+ gwCheck["81-trace-of-general-block",
+   TrueQ[FullSimplify[
+     RAYWarpedFieldEquations[gwGeneral]["Spatial"][[2,"TraceResidual"]]-
+     gwGeneral["Blocks"][[2,"EinsteinCoefficient"]]-
+     Exp[-2B[t]]RAYIntrinsicScalar["Internal"]/n==0]]],
+ gwCheck["82-three-block-fluid-equations",
+   Length[RAYWarpedFieldEquations[gwThree,
+      <|"Pressures"->{0,RE,RI}|>]["Spatial"]]===3]
+
 };
 
 gwReportTests=TestReport[gwCases];
