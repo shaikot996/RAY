@@ -52,6 +52,26 @@ The Raychaudhuri implementation uses expanded definitions built directly from co
 
 ---
 
+## Single-file installation (Windows, Linux, macOS)
+
+Download **[RAYStandalone.wl](RAYStandalone.wl)**. This is the entire package bundled into a single Wolfram Language file. Open Mathematica and run:
+
+~~~mathematica
+Get["C:\\Users\\YourUser\\Downloads\\RAYStandalone.wl"]
+RAYVersion
+RAYHelp[]
+~~~
+
+Replace the path with the actual location. No other RAY package files are required.
+
+If you prefer the conventional application installation, download the **whole repository** (including the Kernel folder) and follow the steps below. Only that form is loaded through Needs["RAY`"] by default.
+
+The extended API is described in [DEVELOPMENT_API.md](DEVELOPMENT_API.md), and [release notes](RELEASE_NOTES_v1.1.0.md) explain the implemented and still-experimental parts.
+
+**Kernel verification:** 7 original regression tests, 11 development tests and 62 timed benchmark cases passed (80/80). Run Tests/RAY_Benchmarks.wl for reproducible functional benchmarks; GUI wizard interaction requires a local Mathematica front end.
+
+---
+
 ## Installation
 
 RAY can be loaded either as a normal Wolfram application, as a paclet, or directly from the repository.
