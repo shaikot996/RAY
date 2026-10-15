@@ -230,3 +230,10 @@ Human display explicitly uses partial fractions for derivatives of multivariate
 functions and dot symbols for time derivatives. The display wrapper preserves the
 full symbolic expression through its InterpretationBox. The new test suite
 Tests/RAY_Handwritten_Tests.wl checks this behavior.
+
+
+## 12. Exact symbolic d+n and multiple warped factors
+
+RAYGeneralWarpedMetric[d,n,A[t],B[t],"Time"->t] now works with **unassigned symbolic d,n**, and returns analytic Ricci tensor block expressions, Ricci scalar, Einstein tensor and lapse-dependent results. Use "InternalGeometry"->"General" (default) for an unspecified intrinsic Ricci tensor, "Flat" for zero intrinsic curvature, {"Einstein",lambdaI}, or {"ConstantCurvature",kI}. External geometry is "Flat" by default.
+
+Use RAYWarpedBlocks for 3+ spatial warp factors, RAYWarpedFieldEquations for homogeneous matter and Lambda, RAYWarpedReport for readable formulas, and RAYWarpedToComponents once you specialize to integer dimensions. See SYMBOLIC_DN_GUIDE.md. This class assumes time-independent reference metrics and block-diagonal time-orthogonal warping.
