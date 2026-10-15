@@ -3,9 +3,9 @@
 > **Version 1.2.0 — symbolic d+n warped geometry.**  
 > **RAY is under active development.** APIs, performance characteristics, and higher-level abstractions may evolve as the package grows.
 
-**RAY** is a Wolfram Language package for explicit-component tensor geometry, general relativity, and Raychaudhuri kinematics.
+**RAY** is a Wolfram Language toolkit for explicit-component tensor geometry, general relativity, Raychaudhuri kinematics and dimension-independent curvature of time-warped product geometries.
 
-**Tagline:** *Explicit-component tensor geometry and relativity for Wolfram Language.*
+**Tagline:** *Explicit and symbolic-dimensional tensor geometry for Wolfram Language.*
 
 RAY is designed around a simple workflow: define an explicit metric matrix and coordinates, optionally define a congruence $u^\mu$, and then query curvature, invariants, kinematics, mixed-index tensors, nonzero components, or a complete report using compact commands.
 
@@ -30,7 +30,7 @@ RAYWarpedReport[g]
 
 Supports arbitrary internal Ricci tensors, constant curvature, Einstein reference metrics, a nontrivial lapse and any number of warped spatial blocks. The new RAYWarpedFieldEquations handles Lambda plus homogeneous energy density and block pressures while retaining tensor constraints on non-Einstein blocks. RAYWarpedToComponents specializes integer dimensions into the older component geometry engine.
 
-**Complete derivations, scope and examples:** [SYMBOLIC_DN_GUIDE.md](SYMBOLIC_DN_GUIDE.md). **Executable checks:** Tests/RAY_SymbolicWarped_Tests.wl (82 new cases).
+**Complete derivations, scope and examples:** [SYMBOLIC_DN_GUIDE.md](SYMBOLIC_DN_GUIDE.md). **Executable checks:** Tests/RAY_SymbolicWarped_Tests.wl (82 new cases). **Wolfram verification:** 82 new cases and 150 existing regression/benchmark cases pass (232/232).
 
 ---
 
