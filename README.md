@@ -68,7 +68,37 @@ If you prefer the conventional application installation, download the **whole re
 
 The extended API is described in [DEVELOPMENT_API.md](DEVELOPMENT_API.md), and [release notes](RELEASE_NOTES_v1.1.0.md) explain the implemented and still-experimental parts.
 
-**Kernel verification:** 7 original regression tests, 11 development tests, 62 benchmarks and 35 formatting cases passed (115/115). Run Tests/RAY_Benchmarks.wl for reproducible functional benchmarks; GUI wizard interaction requires a local Mathematica front end.
+**Kernel verification:** 7 original regression tests, 11 development tests, 62 benchmarks, 35 formatting and 35 handwritten curvature cases passed (150/150). Run Tests/RAY_Benchmarks.wl for reproducible functional benchmarks; GUI wizard interaction requires a local Mathematica front end.
+
+---
+
+## Handwritten curvature output — v1.1.2
+
+RAY now displays Ricci and Einstein tensors **as labeled, nonzero coordinate components**, rather than one huge sideways matrix. For example, `RAYRicci["dd"]` shows lines for R_tt, R_xx, R_yy and R_zz. This presentation is backed by the exact computed array.
+
+~~~mathematica
+RAYRicci["dd"]                      (* concise component-wise equations *)
+RAYRicciScalar[]                    (* time dots, explicit partial derivatives *)
+RAYEinstein["dd"]                   (* coordinate-labeled Einstein components *)
+RAYNonzeroRicci["dd"]               (* existing sparse report, improved math *)
+RAYRicci["dd","Matrix"]             (* original full matrix, handwritten math *)
+RAYRicci["dd",2,2]                  (* one component with readable notation *)
+
+RAYRicciScalar[] // RAW             (* normal Mathematica input, e.g. A'[t] *)
+RAYRicci["dd"] // RAW               (* full component array in Mathematica input *)
+RAYReadable[RAYRaw["RicciScalar"]]  (* pretty display of an algebra-ready expression *)
+
+ric = RAYRaw["Ricci","dd"];         (* unchanged, actual array for algebra *)
+MatrixForm[ric]                     (* raw full matrix if you prefer *)
+~~~
+
+**Notation:** a function of time renders with dots over the function name; derivatives of multivariable metric functions are displayed as explicit partial derivative fractions. Large scalar expressions collect common exponential warp factors where feasible; they do **not** substitute assumed curvature identities or modify RAY's physics.
+
+**RAW means notebook input syntax**, not the old literal `InputForm` printer. It uses Mathematica StandardForm-style source, preserving square brackets, primes such as `A'[t]`, and ordinary Wolfram function syntax for abstract tensors. Copying the output back into an input cell reconstructs the original algebraic expression. RAW is a **display wrapper**; for computation retain your variable or call `RAYRaw[...]`.
+
+`RAYReadable` and `RAYPretty` are presentation conveniences; if you explicitly request `RAYRaw[...] // TraditionalForm` you are invoking Mathematica's own derivative formatting rather than RAY's improved handwritten display. Use `RAYReadable[RAYRaw[...]]` instead.
+
+Tests: `Tests/RAY_Handwritten_Tests.wl` (35 cases). Combined with 35 formatting, 7 geometry, 11 development and 62 benchmark cases, **150 Wolfram kernel tests passed**.
 
 ---
 
@@ -81,7 +111,7 @@ expr = RAYTensor["A",{RAYUp[i]}] RAYTensor["B",{RAYDown[i]}] -
        RAYTensor["A",{RAYUp[j]}] RAYTensor["B",{RAYDown[j]}];
 
 expr                             (* mathematical notation by default *)
-expr // RAYPretty                (* explicitly request TraditionalForm *)
+expr // RAYPretty                (* request handwritten mathematics *)
 expr // RAW                      (* show input syntax: RAYTensor[...] *)
 RAYCanonicalize[expr]            (* 0 *)
 
@@ -91,9 +121,9 @@ RAYTensor["Riemann",
 RAYAbstractCovD[RAYTensor["A",{RAYUp[b]}],a]
 ~~~
 
-**Postfix RAW**: `expr // RAW` is equivalent to `RAW[expr]`. It unwraps common TraditionalForm/MatrixForm/TableForm wrappers and **displays** the exact Wolfram Language syntax using InputForm. `RAW` returns an InputForm **display wrapper**, not a replacement for the algebraic expression; keep the original `expr` for further tensor manipulation (or use RAYRaw[...] for explicit tensors). For example, `RAYRicci["dd"] // RAW` shows an unformatted component matrix.
+**Postfix RAW**: `expr // RAW` is equivalent to `RAW[expr]`. It unwraps common TraditionalForm/MatrixForm/TableForm wrappers and **displays** the exact Wolfram Language syntax using notebook-style StandardForm. `RAW` returns a source-code **display wrapper**, not a replacement for the algebraic expression; keep the original `expr` for further tensor manipulation (or use RAYRaw[...] for explicit tensors). For example, `RAYRicci["dd"] // RAW` shows an unformatted component matrix.
 
-The 35-case formatting suite at `Tests/RAY_Formatting_Tests.wl` checks tensor typography, inverse conversion, postfix RAW and compatibility with existing component displays. Along with previous tests, v1.1.1 has **115 passing Wolfram kernel checks**. These include programmatic notebook-box round trips; graphical notebook front-end interaction has not been tested separately.
+The v1.1.2 package has **150 passing Wolfram kernel checks**, including a separate 35-case handwritten curvature presentation suite. These include programmatic notebook-box round trips; graphical notebook front-end interaction has not been tested separately.
 
 ---
 
