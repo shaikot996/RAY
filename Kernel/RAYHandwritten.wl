@@ -195,7 +195,7 @@ RAYWeylSquared[] /; rayRequireMetric[]===True :=
  RAYReadable[rayWeylSquared[]];
 
 (* Make RAYComponentDisplay and RAYHandwritten unwrap to their
-   algebraic payload. RAW uses Mathematica StandardForm rather
+   algebraic payload. RAW uses Mathematica StandardForm boxes rather
    than InputForm because StandardForm renders f'[t] instead of
    Derivative[1][f][t], and is the notebook's normal input syntax. *)
 rayRemoveDisplayWrappers[expression_] := FixedPoint[
@@ -212,12 +212,25 @@ rayRemoveDisplayWrappers[expression_] := FixedPoint[
   12
 ];
 
-RAW[expression_] := StandardForm[
-  rayRemoveDisplayWrappers[expression]];
+(* StandardForm itself would reapply the pretty RAYTensor MakeBoxes rules.
+   Temporarily localize those definitions to show ACTUAL Mathematica input
+   while still using primes for derivatives and square brackets for calls. *)
+RAYNotebookInput /: MakeBoxes[
+  RAYNotebookInput[expr_],
+  fmt:(StandardForm|TraditionalForm)] :=
+ Module[{boxes},
+  boxes=Block[{RAYTensor,RAYUp,RAYDown,RAYNabla,RAYDummy},
+    With[{source=expr},MakeBoxes[source,StandardForm]]];
+  With[{rendered=boxes},
+    InterpretationBox[rendered,expr,Editable->False]]
+ ];
+
+RAW[expression_] :=
+  RAYNotebookInput[rayRemoveDisplayWrappers[expression]];
 
 $rayHelpRows=Join[$rayHelpRows,{
  {"RAYReadable[expr]","Readable math with dot time derivatives, partial derivative fractions and collected warp factors."},
  {"RAYReadableTensor[matrix,name,config]","List nonzero coordinate-indexed tensor components as equations."},
  {"RAYRicci[dd]","Readable nonzero Ricci components, preserving full underlying tensor data."},
- {"RAW[expr] (or expr // RAW)","Mathematica StandardForm source: primes for time derivatives, square bracket input, full raw tensor arrays."}
+ {"RAW[expr] (or expr // RAW)","Mathematica notebook input syntax: primes, square brackets, complete raw expressions and unformatted RAYTensor code."}
 }];
