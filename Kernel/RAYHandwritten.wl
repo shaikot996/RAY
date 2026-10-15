@@ -114,6 +114,10 @@ RAYReadableTensor[array_List,name_String:"Tensor",
  config_String:"dd"] :=
  RAYComponentDisplay[array,name,config];
 
+(* Also improve the explicit pretty-print command: it remains a display
+   wrapper, but multivariable derivatives now use partial fractions. *)
+RAYPretty[expression_] := RAYReadable[expression];
+
 (* The default tensor display shows readable nonzero components.
    Use RAYRaw for actual arrays; MatrixForm[RAYRaw[...]] for full matrices.
    RAW of this display unwraps the entire original array. *)
