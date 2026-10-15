@@ -221,9 +221,21 @@ RAYReadable::usage = "RAYReadable[expr] prints formulas like handwritten mathema
 
 RAYReadableTensor::usage = "RAYReadableTensor[matrix, name, config] displays nonzero coordinate-indexed components as labeled equations without a giant matrix.";
 
+RAYGeneralWarpedMetric::usage = "RAYGeneralWarpedMetric[d,n,A[t],B[t],opts] derives exact Ricci/Einstein formulas with symbolic external dimension d and internal dimension n. Options: Time, Lapse, ExternalGeometry, InternalGeometry. No finite metric array is constructed.";
+
+RAYWarpedBlocks::usage = "RAYWarpedBlocks[{{name,m,warp,geometry},...},opts] derives curvature for arbitrary symbolic dimensions of multiple time-dependent warped spatial blocks.";
+
+RAYWarpedToComponents::usage = "RAYWarpedToComponents[model,name,{{coords,referenceMetric},...}] instantiates a symbolic warped model when block dimensions are concrete integers.";
+
+RAYWarpedReport::usage = "RAYWarpedReport[model] displays general warped-product Ricci/Einstein formulas as a readable physics report.";
+
+RAYIntrinsicScalar::usage = "RAYIntrinsicScalar[name] is an inert placeholder for the intrinsic scalar curvature of an unspecified spatial reference metric.";
+
+RAYWarpedFieldEquations::usage = "RAYWarpedFieldEquations[model,source] derives Einstein equations with Lambda and homogeneous energy density/pressures for symbolic d+n blocks, retaining full tensor equations for non-Einstein reference geometries.";
+
 Begin["`Private`"];
 
-$RAYVersion = "1.1.2";
+$RAYVersion = "1.2.0";
 RAYVersion := $RAYVersion;
 
 $rayMetrics = <||>;
@@ -1437,6 +1449,7 @@ Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYSymbolic.wl"}]];
 Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYAbstractAlgebra.wl"}]];
 Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYFormatting.wl"}]];
 Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYHandwritten.wl"}]];
+Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYSymbolicWarped.wl"}]];
 
 $rayHelpRows=Join[$rayHelpRows,{
   {"RAYRaw[RAYRicci[dd]]","Raw form of a complete RAY geometry call."},

@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.0 — 2026-10-15
+
+- Introduce exact dimension-independent d+n time-warped Ricci/Einstein formulas with symbolic d,n.
+- Add variable lapse, arbitrary reference curvature (including non-Einstein intrinsic Ricci tensor) and any number of warped spatial blocks.
+- Derive symbolic Einstein equations for homogeneous energy density, block pressures and cosmological constant without losing intrinsic anisotropy.
+- Add a checked bridge from symbolic descriptors to explicit-component geometry after integer specialization.
+- Verify 82 new analytical, validation and explicit-geometry tests, alongside the prior 150 regressions and benchmarks.
+- Document assumptions and full examples in SYMBOLIC_DN_GUIDE.md.
+
+
+
 ## 1.1.2 — 2026-10-15
 
 - Display Ricci and Einstein tensors as labeled nonzero coordinate components by default rather than oversized matrices.
