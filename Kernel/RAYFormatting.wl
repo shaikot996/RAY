@@ -53,34 +53,26 @@ rayPrettyTensorBoxes[name_String,indices_List,form_] := Module[
 
 RAYTensor /: MakeBoxes[RAYTensor[name_String,indices_List],
    form:(StandardForm|TraditionalForm)] :=
- InterpretationBox[
-   rayPrettyTensorBoxes[name,indices,form],
-   RAYTensor[name,indices],
-   Editable->False
+ With[{boxes=rayPrettyTensorBoxes[name,indices,form]},
+   InterpretationBox[boxes,RAYTensor[name,indices],Editable->False]
  ];
 
 RAYDummy /: MakeBoxes[RAYDummy[n_Integer],
    form:(StandardForm|TraditionalForm)] :=
- InterpretationBox[
-   SubscriptBox["\[Lambda]",MakeBoxes[n,form]],
-   RAYDummy[n],
-   Editable->False
+ With[{boxes=SubscriptBox["\[Lambda]",MakeBoxes[n,form]]},
+   InterpretationBox[boxes,RAYDummy[n],Editable->False]
  ];
 
 RAYUp /: MakeBoxes[RAYUp[index_],
    form:(StandardForm|TraditionalForm)] :=
- InterpretationBox[
-   RowBox[{"\[UpArrow]",MakeBoxes[index,form]}],
-   RAYUp[index],
-   Editable->False
+ With[{boxes=RowBox[{"\[UpArrow]",MakeBoxes[index,form]}]},
+   InterpretationBox[boxes,RAYUp[index],Editable->False]
  ];
 
 RAYDown /: MakeBoxes[RAYDown[index_],
    form:(StandardForm|TraditionalForm)] :=
- InterpretationBox[
-   RowBox[{"\[DownArrow]",MakeBoxes[index,form]}],
-   RAYDown[index],
-   Editable->False
+ With[{boxes=RowBox[{"\[DownArrow]",MakeBoxes[index,form]}]},
+   InterpretationBox[boxes,RAYDown[index],Editable->False]
  ];
 
 rayPrettyNablaBoxes[index_,expression_,form_] := Module[
@@ -96,10 +88,8 @@ rayPrettyNablaBoxes[index_,expression_,form_] := Module[
 
 RAYNabla /: MakeBoxes[RAYNabla[index_,expression_],
    form:(StandardForm|TraditionalForm)] :=
- InterpretationBox[
-   rayPrettyNablaBoxes[index,expression,form],
-   RAYNabla[index,expression],
-   Editable->False
+ With[{boxes=rayPrettyNablaBoxes[index,expression,form]},
+   InterpretationBox[boxes,RAYNabla[index,expression],Editable->False]
  ];
 
 (* Pretty is optional: abstract tensor results already typeset themselves.
