@@ -199,3 +199,34 @@ Only this file is necessary for direct loading. For automatic Needs loading, ins
 ## 10. Verification
 
 The v1.1.0 source was tested in Wolfram Language 15: original regressions 7/7, new regressions 11/11 and timed functional benchmarks 62/62, a total of 80/80 passing cases. Run Tests/RAY_Benchmarks.wl to reproduce the benchmark suite.
+
+
+## 11. Readable curvature and notebook-style source output (v1.1.2)
+
+Large warp-product curvature expressions should be inspected using the default
+`RAYRicci["dd"]` component equations or `RAYRicciScalar[]`. For full matrices:
+
+~~~mathematica
+RAYRicci["dd","Matrix"]
+RAYEinstein["dd","Matrix"]
+MatrixForm[RAYRaw["Ricci","dd"]]
+~~~
+
+For mathematical notation of arbitrary expressions:
+
+~~~mathematica
+RAYReadable[RAYRaw["RicciScalar"]]
+RAYPretty[D[P[y,z],y]]
+~~~
+
+For normal Mathematica code as it appears in a notebook input cell, use
+`expr // RAW`. This now renders the Mathematica StandardForm equivalent
+of the exact raw expression, with single-variable derivatives printed as
+`A'[t]` and `A''[t]` rather than `Derivative[1][A][t]`. For abstract tensors
+it reveals the actual RAYTensor/RAYUp code rather than the mathematical superscript display.
+RAW is for source presentation; use RAYRaw to obtain arrays for computation.
+
+Human display explicitly uses partial fractions for derivatives of multivariate
+functions and dot symbols for time derivatives. The display wrapper preserves the
+full symbolic expression through its InterpretationBox. The new test suite
+Tests/RAY_Handwritten_Tests.wl checks this behavior.
