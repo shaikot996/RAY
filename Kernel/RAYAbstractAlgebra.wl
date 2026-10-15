@@ -142,25 +142,25 @@ rayAbsKnownTensorQ[x_]:=MatchQ[x,RAYTensor[_String,_List]];
 (* Contract a single factor pair, metric raising/lowering or delta
    substitution. Missing complementary factors leave an Einstein pair
    as a formal contraction. *)
-rayAbsReduceFactors[factors_List,d_Integer] := Catch[Module[
-  {f=factors,n=Length[factors],i,j,k,h,idx,other,otherIdx,
-   p,q,remain,name,newIndices,newFactor,label,free},
-  (* metric traces and algebraic Riemann->Ricci traces *)
+rayAbsReduceFactors[factors_List,d_] := Catch[
+ Module[{f=factors,n=Length[factors],i,j,k,h,idx,other,otherIdx,
+   p,q,remain,name,newIndices,newFactor,free},
   Do[
     If[MatchQ[f[[i]],RAYTensor["Delta",_List]],
       idx=f[[i,2]];
-      If[Length[idx]===2 && rayAbsLabel[idx[[1]]]===rayAbsLabel[idx[[2]]] &&
-        rayAbsVariance[idx[[1]]]===-rayAbsVariance[idx[[2]]],
+      If[Length[idx]===2 &&
+         rayAbsLabel[idx[[1]]]===rayAbsLabel[idx[[2]]] &&
+         rayAbsVariance[idx[[1]]]===-rayAbsVariance[idx[[2]]],
         Throw[{True,ReplacePart[f,i->d]},"RAYReduction"]]];
     If[MatchQ[f[[i]],RAYTensor["Riemann",_List]],
       idx=f[[i,2]];
       If[Length[idx]===4 && Head[idx[[1]]]===RAYUp,
         If[rayAbsLabel[idx[[1]]]===rayAbsLabel[idx[[3]]],
           Throw[{True,ReplacePart[f,
-            i->RAYTensor["Ricci",idx[[{2,4},"RAYReduction"]]]]}]];
+            i->RAYTensor["Ricci",idx[[{2,4}]]]]},"RAYReduction"]];
         If[rayAbsLabel[idx[[1]]]===rayAbsLabel[idx[[4]]],
           Throw[{True,ReplacePart[f,
-            i->(-RAYTensor["Ricci",idx[[{2,3},"RAYReduction"]]])]}]];
+            i->(-RAYTensor["Ricci",idx[[{2,3}]]])]},"RAYReduction"]];
         If[rayAbsLabel[idx[[1]]]===rayAbsLabel[idx[[2]]],
           Throw[{True,ReplacePart[f,i->0]},"RAYReduction"]]
       ]
@@ -195,14 +195,16 @@ rayAbsReduceFactors[factors_List,d_Integer] := Catch[Module[
             newFactor=RAYTensor[other[[1]],newIndices]
           ];
           Throw[{True,Join[
-            Delete[f,{{Max[i,j]},{Min[i,j]}},"RAYReduction"],{newFactor}]}],
+            Delete[f,{{Max[i,j]},{Min[i,j]}}],{newFactor}]},
+            "RAYReduction"],
           {h,Length[otherIdx]}],
         {k,2}],
       {j,n}],
     {i,n}
   ];
   {False,f}
-],"RAYReduction"];
+ ],"RAYReduction"
+];
 
 Options[RAYContract]={"Dimension"->Automatic,"MaxIterations"->32};
 RAYContract[expr_,OptionsPattern[]] := Module[
