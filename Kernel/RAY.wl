@@ -219,7 +219,7 @@ RAYPretty::usage = "expr // RAYPretty renders symbolic expressions in traditiona
 
 Begin["`Private`"];
 
-$RAYVersion = "1.1.0";
+$RAYVersion = "1.1.1";
 RAYVersion := $RAYVersion;
 
 $rayMetrics = <||>;
