@@ -3,16 +3,16 @@
    Presentation wrappers preserve the exact Mathematica expression.
    No curvature values, geometry data or tensor algorithms are modified. *)
 
-Options[RAYReadable] = {"FactorTimeWarp" -> True};
+Options[RAYReadable] = {"FactorTimeWarp" -> True, "DerivativeNotation" -> "Partial"};
 
 rayHandTimeQ[x_] := MatchQ[x,_Symbol] &&
   MemberQ[{"t","time","tau","\[Tau]"},SymbolName[Unevaluated[x]]];
 
-rayHandDerivative[f_, orders_List, args_List] := Module[
+rayHandDerivative[f_, orders_List, args_List,notation_:"Partial"] := Module[
   {nn=Total[orders], vars, pairs, bare=f},
   If[Length[orders]=!=Length[args] || nn===0,
     Return[(Derivative@@orders)[f]@@args]];
-  If[Length[args]===1 && rayHandTimeQ[First[args]] &&
+  If[notation==="Dot" && Length[args]===1 && rayHandTimeQ[First[args]] &&
      1<=nn<=3,
     Return[(Nest[OverDot,bare,nn])@@args]];
   pairs=MapThread[If[#2===1,#1,{#1,#2}]&,{args,orders}];
@@ -23,9 +23,9 @@ rayHandDerivative[f_, orders_List, args_List] := Module[
 
 (* Replace ordinary Derivative[n1,n2,...][f][args] only for display.
    Inactive[D] renders conventional partial derivative fractions. *)
-rayHandExpression[expr_] := expr /. HoldPattern[
+rayHandExpression[expr_,notation_:"Partial"] := expr /. HoldPattern[
   Derivative[orders__Integer][f_][args__]] :>
-   rayHandDerivative[f,{orders},{args}];
+   rayHandDerivative[f,{orders},{args},notation];
 
 rayReadableWarpFactors[expr_] :=
  DeleteDuplicates@Cases[Unevaluated[expr],
@@ -49,7 +49,15 @@ rayReadableSimplify[expr_,factorWarp_:True] := Module[
    and explicit partials for multivariable functions. *)
 RAYReadable[expression_,OptionsPattern[]] :=
   RAYHandwritten[rayReadableSimplify[expression,
-   OptionValue["FactorTimeWarp"]]];
+   OptionValue["FactorTimeWarp"]],OptionValue["DerivativeNotation"]];
+
+RAYHandwritten /: MakeBoxes[RAYHandwritten[expr_,notation_],
+   fmt:(StandardForm|TraditionalForm)] :=
+ Module[{pretty,box},
+   pretty=rayHandExpression[expr,notation];
+   box=With[{displayExpr=pretty},MakeBoxes[displayExpr,TraditionalForm]];
+   With[{rendered=box},InterpretationBox[rendered,expr,Editable->False]]
+ ];
 
 RAYHandwritten /: MakeBoxes[RAYHandwritten[expr_],
    fmt:(StandardForm|TraditionalForm)] :=
@@ -205,7 +213,7 @@ RAYWeylSquared[] /; rayRequireMetric[]===True :=
 rayRemoveDisplayWrappers[expression_] := FixedPoint[
   ReplaceAll[#,{
     HoldPattern[RAYComponentDisplay[array_,___]] :> array,
-    HoldPattern[RAYHandwritten[x_]] :> x,
+    HoldPattern[RAYHandwritten[x_,___]] :> x,
     HoldPattern[TraditionalForm[x_]] :> x,
     HoldPattern[MatrixForm[x_,___]] :> x,
     HoldPattern[TableForm[x_,___]] :> x,
@@ -233,7 +241,7 @@ RAW[expression_] :=
   RAYNotebookInput[rayRemoveDisplayWrappers[expression]];
 
 $rayHelpRows=Join[$rayHelpRows,{
- {"RAYReadable[expr]","Readable math with dot time derivatives, partial derivative fractions and collected warp factors."},
+ {"RAYReadable[expr]","Readable partial derivative fractions by default; choose \"DerivativeNotation\"->\"Dot\" for time derivatives."},
  {"RAYReadableTensor[matrix,name,config]","List nonzero coordinate-indexed tensor components as equations."},
  {"RAYRicci[dd]","Readable nonzero Ricci components, preserving full underlying tensor data."},
  {"RAW[expr] (or expr // RAW)","Mathematica notebook input syntax: primes, square brackets, complete raw expressions and unformatted RAYTensor code."}
