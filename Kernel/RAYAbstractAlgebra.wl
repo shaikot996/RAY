@@ -53,7 +53,7 @@ rayAbsGenerators[name_,idx_List]:=Module[{n=Length[idx],gens={},sym},
 
 (* Generates the orbit under index symmetries; the four-index pair
    interchange is a permutation {3,4,1,2}. *)
-rayAbsTensorNormalize[RAYTensor[name_String,idx_List]]:=Module[
+rayAbsTensorNormalize[RAYTensor[name_String,idx_List]]:=Catch[Module[
   {gens=rayAbsGenerators[name,idx],queue={{idx,1}},seen=<||>,
    cur,inds,sgn,new,p,rule,ordered},
   If[!AllTrue[idx,rayAbsIndexQ],
@@ -63,7 +63,7 @@ rayAbsTensorNormalize[RAYTensor[name_String,idx_List]]:=Module[
     inds=cur[[1]];sgn=cur[[2]];
     p=rayAbsSortKey[inds];
     If[KeyExistsQ[seen,p],
-      If[seen[p][[2]] =!= sgn,Return[0]];
+      If[seen[p][[2]] =!= sgn,Throw[0,"RAYTensorNorm"]];
       Continue[]];
     AssociateTo[seen,p->{inds,sgn}];
     Do[
@@ -77,7 +77,7 @@ rayAbsTensorNormalize[RAYTensor[name_String,idx_List]]:=Module[
   ];
   ordered=First@SortBy[Values[seen],rayAbsSortKey[#[[1]]]&];
   ordered[[2]] RAYTensor[name,ordered[[1]]]
-];
+],"RAYTensorNorm"];
 rayAbsTensorNormalize[x_]:=x;
 
 rayAbsFactors[term_]:=If[Head[term]===Times,List@@term,{term}];
@@ -142,7 +142,7 @@ rayAbsKnownTensorQ[x_]:=MatchQ[x,RAYTensor[_String,_List]];
 (* Contract a single factor pair, metric raising/lowering or delta
    substitution. Missing complementary factors leave an Einstein pair
    as a formal contraction. *)
-rayAbsReduceFactors[factors_List,d_Integer] := Module[
+rayAbsReduceFactors[factors_List,d_Integer] := Catch[Module[
   {f=factors,n=Length[factors],i,j,k,h,idx,other,otherIdx,
    p,q,remain,name,newIndices,newFactor,label,free},
   (* metric traces and algebraic Riemann->Ricci traces *)
@@ -151,18 +151,18 @@ rayAbsReduceFactors[factors_List,d_Integer] := Module[
       idx=f[[i,2]];
       If[Length[idx]===2 && rayAbsLabel[idx[[1]]]===rayAbsLabel[idx[[2]]] &&
         rayAbsVariance[idx[[1]]]===-rayAbsVariance[idx[[2]]],
-        Return[{True,ReplacePart[f,i->d]}]]];
+        Throw[{True,ReplacePart[f,i->d]},"RAYReduction"]]];
     If[MatchQ[f[[i]],RAYTensor["Riemann",_List]],
       idx=f[[i,2]];
       If[Length[idx]===4 && Head[idx[[1]]]===RAYUp,
         If[rayAbsLabel[idx[[1]]]===rayAbsLabel[idx[[3]]],
-          Return[{True,ReplacePart[f,
-            i->RAYTensor["Ricci",idx[[{2,4}]]]]}]];
+          Throw[{True,ReplacePart[f,
+            i->RAYTensor["Ricci",idx[[{2,4},"RAYReduction"]]]]}]];
         If[rayAbsLabel[idx[[1]]]===rayAbsLabel[idx[[4]]],
-          Return[{True,ReplacePart[f,
-            i->(-RAYTensor["Ricci",idx[[{2,3}]]])]}]];
+          Throw[{True,ReplacePart[f,
+            i->(-RAYTensor["Ricci",idx[[{2,3},"RAYReduction"]]])]}]];
         If[rayAbsLabel[idx[[1]]]===rayAbsLabel[idx[[2]]],
-          Return[{True,ReplacePart[f,i->0]}]]
+          Throw[{True,ReplacePart[f,i->0]},"RAYReduction"]]
       ]
     ],
     {i,n}
@@ -194,15 +194,15 @@ rayAbsReduceFactors[factors_List,d_Integer] := Module[
             newIndices=ReplacePart[otherIdx,h->remain];
             newFactor=RAYTensor[other[[1]],newIndices]
           ];
-          Return[{True,Join[
-            Delete[f,{{Max[i,j]},{Min[i,j]}}],{newFactor}]}],
+          Throw[{True,Join[
+            Delete[f,{{Max[i,j]},{Min[i,j]}},"RAYReduction"],{newFactor}]}],
           {h,Length[otherIdx]}],
         {k,2}],
       {j,n}],
     {i,n}
   ];
   {False,f}
-];
+],"RAYReduction"];
 
 Options[RAYContract]={"Dimension"->Automatic,"MaxIterations"->32};
 RAYContract[expr_,OptionsPattern[]] := Module[
