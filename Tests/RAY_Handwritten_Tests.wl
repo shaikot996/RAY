@@ -49,7 +49,7 @@ hhTests={
  VerificationTest[
    !FreeQ[ToBoxes[RAYRicci["dd"],StandardForm],
      TagBox[_FractionBox,"InactiveDTraditional",___]],
-   True,TestID->"10-time-derivative-two-dots"
+   True,TestID->"10-partial-derivative-Ricci"
  ],
  VerificationTest[
    !FreeQ[ToBoxes[RAYRicci["dd"],StandardForm],
@@ -80,8 +80,8 @@ hhTests={
  ],
  VerificationTest[
    !FreeQ[ToBoxes[RAYRicciScalar[],StandardForm],
-     OverscriptBox["B","."]],
-   True,TestID->"17-scalar-dot-B"
+     TagBox[_FractionBox,"InactiveDTraditional",___]],
+   True,TestID->"17-scalar-partial-B"
  ],
  VerificationTest[
    !FreeQ[ToBoxes[RAYRicciScalar[],StandardForm],
