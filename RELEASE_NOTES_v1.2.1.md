@@ -4,7 +4,7 @@ Release date: 2026-10-15.
 
 ## Correctness fix (important)
 
-Previous RAYGeneralWarpedMetric / RAYWarpedBlocks expressions assumed *time-dependent warp factors only*, but silently accepted inputs such as A[t,x]. This was mathematically unsafe: the time-only curvature formulas do **not** include spatial derivatives and could return incorrect results. **Now these calls reject multi-coordinate-dependent function inputs** and recommend the new coordinate-covariant API. The other time-only functionality remains intact.
+Previous RAYGeneralWarpedMetric / RAYWarpedBlocks expressions assumed *time-dependent warp factors only*, but silently accepted inputs such as A[t,x]. This was mathematically unsafe: the time-only curvature formulas do **not** include spatial derivatives and could return incorrect results. **Now these calls reject multi-coordinate-dependent function inputs** and recommend the new coordinate-covariant API. Bare undeclared symbols are also rejected (for example A[t] Sin[x]); declare actual constant parameters explicitly with "Parameters"->{c1,c2}. The other time-only functionality remains intact.
 
 ## New exact covariant geometry
 
@@ -21,12 +21,12 @@ Previous RAYGeneralWarpedMetric / RAYWarpedBlocks expressions assumed *time-depe
 
 ## Tested in Wolfram Language kernel
 
-- 41/41 new covariant/format/safety tests. This includes full comparisons to independently computed coordinate Ricci tensors in 3D and 4D with curved internal S^2 and nonzero mixed gradients, and 3D independent Weyl curvature tests.
+- 46/46 new covariant/format/safety tests. This includes full comparisons to independently computed coordinate Ricci tensors in 3D and 4D with curved internal S^2 and nonzero mixed gradients, and 3D independent Weyl curvature tests.
 - 82/82 prior symbolic d+n checks.
 - 70/70 notebook-formatting regressions.
 - 62/62 benchmark cases.
 - 18/18 original and development regression cases.
-- **273/273 tests passed**.
+- **278/278 tests passed**.
 
 The explicit coordinate-based base must have an integer number of coordinates; the internal fiber dimension may remain symbolic. For fully symbolic d and n, use RAYAbstractWarpedCurvature, which keeps base covariant derivatives formal.
 
