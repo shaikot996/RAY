@@ -307,8 +307,8 @@ rayAbsEvaluate[expr_,assign_Association,d_Integer] := Module[
 
 rayAbsEvaluateTerm[term_,assign_Association,d_Integer] := Module[
   {factors=rayAbsFactors[term],indices,groups,dummies,all,tuples},
-  indices=Cases[term,RAYUp[x_]:>{x,1} |
-    RAYDown[x_]:>{x,-1},Infinity];
+  indices=Join[Cases[term,RAYUp[x_]:>{x,1},Infinity],
+    Cases[term,RAYDown[x_]:>{x,-1},Infinity]];
   groups=GatherBy[indices,First];
   If[AnyTrue[groups,Length[#]>2 || (Length[#]===2 &&
         Sort[#[[All,2]]] =!= {-1,1})&],Return[$Failed]];
