@@ -249,7 +249,25 @@ benchmarkCases={
    sol=RAYSolve[eq,{a},{t,0,2},{a[0]==1,a'[0]==1}];
    If[!AssociationQ[sol],Return[False]];
    val=N[a[2]/.sol["Solutions"][[1]]];
-   Abs[val-Exp[2]]<10^-5]]
+   Abs[val-Exp[2]]<10^-5]],
+ rayBench["58-registered-user-vector",
+  (RAYDefineMetric["BRegistered",{t,x},DiagonalMatrix[{-1,Exp[2t]}]];
+   RAYRegisterTensor["UserV",{1,Exp[t]},"u"]==="UserV")],
+ rayBench["59-registered-contravariant-components",
+   RAYToComponents[RAYTensor["UserV",{RAYUp[a]}],{RAYUp[a]}]===
+    {1,Exp[t]}],
+ rayBench["60-registered-covariant-components",
+   RAYToComponents[RAYTensor["UserV",{RAYDown[a]}],{RAYDown[a]}]===
+    {-1,Exp[3t]}],
+ rayBench["61-abstract-derivative-component-bridge",
+   TrueQ[FullSimplify[
+     RAYToComponents[RAYAbstractCovD[
+       RAYTensor["UserV",{RAYUp[b]}],a],
+       {RAYDown[a],RAYUp[b]}]===
+       RAYCovD[{1,Exp[t]},"u"]]]],
+ rayBench["62-unregister-user-tensor",
+   RAYUnregisterTensor["UserV"]==="UserV"]
+
 };
 
 benchmarkReport=TestReport[benchmarkCases];
