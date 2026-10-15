@@ -231,6 +231,8 @@ RAYWarpedReport::usage = "RAYWarpedReport[model] displays general warped-product
 
 RAYIntrinsicScalar::usage = "RAYIntrinsicScalar[name] is an inert placeholder for the intrinsic scalar curvature of an unspecified spatial reference metric.";
 
+RAYWarpedFieldEquations::usage = "RAYWarpedFieldEquations[model,source] derives Einstein equations with Lambda and homogeneous energy density/pressures for symbolic d+n blocks, retaining full tensor equations for non-Einstein reference geometries.";
+
 Begin["`Private`"];
 
 $RAYVersion = "1.2.0";
