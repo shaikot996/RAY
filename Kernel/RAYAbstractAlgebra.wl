@@ -330,7 +330,7 @@ rayAbsEvalFactor[RAYTensor[name_String,idx_List],all_Association,d_Integer] :=
     If[name==="Delta",
       Return[KroneckerDelta@@positions]];
     config=StringJoin[(If[Head[#]===RAYUp,"u","d"]&/@idx)];
-    tensor=rayTensorByName[name,config];
+    tensor=rayAbsGetTensor[name,config];
     If[tensor===$Failed,Return[$Failed]];
     Extract[tensor,positions]
   ];
@@ -345,4 +345,60 @@ $rayHelpRows=Join[$rayHelpRows,{
  {"RAYBianchiReduce[expr]","Reduce all-lowered Riemann expressions by the first Bianchi identity."},
  {"RAYCovDCommutator[tensor,a,b]","Formal Levi-Civita curvature commutator on a tensor."},
  {"RAYToComponents[expr,freeIndices]","Evaluate an indexed tensor polynomial with the active explicit geometry."}
+}];
+
+
+(* User-defined tensor components associated with the active explicit metric.
+   Unlike the built-in curvature tensors, these can represent arbitrary
+   scalar/vector/form/tensor fields with a declared index placement. *)
+$rayAbstractComponents=<||>;
+
+RAYRegisterTensor[name_String,components_List,config_String] /;
+    rayRequireMetric[]===True :=
+ Module[{d=rayDim[],rank=ArrayDepth[components],cfg,key},
+  cfg=rayParseConfig[config,rank];
+  If[rank<1 || cfg===$Failed ||
+     Dimensions[components]=!=ConstantArray[d,rank],
+    Return[rayFail["RAYRegisterTensor: tensor shape and index configuration do not match the active metric."]]];
+  If[MemberQ[{"Metric","Riemann","Ricci","Einstein","Weyl",
+      "Shear","Vorticity"},name],
+    Return[rayFail["RAYRegisterTensor: built-in geometry tensor names are reserved."]]];
+  key=$rayActiveMetric<>"::"<>name;
+  AssociateTo[$rayAbstractComponents,key->
+    <|"Data"->components,"Configuration"->cfg|>];
+  name
+ ];
+RAYUnregisterTensor[name_String] /; rayRequireMetric[]===True :=
+  (KeyDropFrom[$rayAbstractComponents,$rayActiveMetric<>"::"<>name];name);
+
+rayAbsGetTensor[name_String,config_String] := Module[
+ {key=$rayActiveMetric<>"::"<>name,entry,cfg},
+ If[!KeyExistsQ[$rayAbstractComponents,key],
+   Return[rayTensorByName[name,config]]];
+ entry=$rayAbstractComponents[key];
+ cfg=rayParseConfig[config,Length[entry["Configuration"]]];
+ If[cfg===$Failed,Return[$Failed]];
+ rayChangeIndices[entry["Data"],entry["Configuration"],cfg]
+];
+
+(* Explicit component bridge for a covariant derivative: the derivative
+   index is first and lower. RAYAbstractCovD[...,a] uses RAYDown[a]. *)
+rayAbsEvalFactor[
+  RAYNabla[RAYDown[mu_],RAYTensor[name_String,idx_List]],
+  all_Association,d_Integer] :=
+ Module[{positions,cfg,raw,der},
+  positions=Lookup[all,Join[{mu},rayAbsLabel/@idx],Missing["Index"]];
+  If[MemberQ[positions,_Missing],Return[$Failed]];
+  cfg=StringJoin[If[Head[#]===RAYUp,"u","d"]&/@idx];
+  raw=rayAbsGetTensor[name,cfg];
+  If[raw===$Failed,Return[$Failed]];
+  der=RAYCovD[raw,cfg];
+  If[der===$Failed,Return[$Failed]];
+  Extract[der,positions]
+ ];
+
+$rayHelpRows=Join[$rayHelpRows,{
+ {"RAYRegisterTensor[name,array,config]","Register explicit arbitrary tensor components for RAYToComponents."},
+ {"RAYUnregisterTensor[name]","Remove a registered arbitrary tensor from the active metric."},
+ {"RAYToComponents[RAYAbstractCovD[...],free]","Evaluate an abstract covariant derivative as explicit RAYCovD components."}
 }];
