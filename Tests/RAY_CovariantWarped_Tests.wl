@@ -160,6 +160,27 @@ AppendTo[tests,VerificationTest[
  FullSimplify[weylRic-weylRicExpected],
  ConstantArray[0,{3,3}],TestID->"3D-conformal-tensor-independent"]];
 
+
+(* Reject otherwise silently missed spatial dependence; allow declared constants. *)
+AppendTo[tests,VerificationTest[
+ Quiet[RAYGeneralWarpedMetric[d,n,A[t]+x,B[t],"Time"->t]],
+ $Failed,TestID->"reject-bare-spatial-coordinate"]];
+AppendTo[tests,VerificationTest[
+ Quiet[RAYGeneralWarpedMetric[d,n,A[t] Sin[x],B[t],"Time"->t]],
+ $Failed,TestID->"reject-hidden-Sin-spatial-coordinate"]];
+AppendTo[tests,VerificationTest[
+ AssociationQ[RAYGeneralWarpedMetric[d,n,A[t]+x,B[t],
+  "Time"->t,"Parameters"->{x}]],
+ True,TestID->"explicit-constant-parameter"]];
+AppendTo[tests,VerificationTest[
+ Quiet[RAYGeneralWarpedMetric[d,n,A[t],B[t],
+  "Time"->t,"Lapse"->L[t]+x]],
+ $Failed,TestID->"reject-bare-spatial-lapse"]];
+AppendTo[tests,VerificationTest[
+ AssociationQ[RAYGeneralWarpedMetric[d,n,A[t^2],B[t],
+  "Time"->t]],
+ True,TestID->"accept-composite-time-argument"]];
+
 rep=TestReport[tests];
 covSummary=<|"Total"->Length[tests],
  "Pass"->Length[rep[[1]]["TestsSucceededKeys"]],
