@@ -213,6 +213,10 @@ RAYRegisterTensor::usage = "RAYRegisterTensor[name,array,config] registers expli
 
 RAYUnregisterTensor::usage = "RAYUnregisterTensor[name] removes a user-defined component tensor from the active metric.";
 
+RAW::usage = "expr // RAW (or RAW[expr]) shows the exact unformatted Wolfram Language InputForm, unwrapping TraditionalForm and MatrixForm. The result is a display wrapper; use the original expression or RAYRaw[...] for algebra.";
+
+RAYPretty::usage = "expr // RAYPretty renders symbolic expressions in traditional mathematical notation; RAYTensor and RAYNabla also display automatically in StandardForm.";
+
 Begin["`Private`"];
 
 $RAYVersion = "1.1.0";
@@ -1427,6 +1431,7 @@ Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYMatter.wl"}]];
 Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYNumerics.wl"}]];
 Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYSymbolic.wl"}]];
 Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYAbstractAlgebra.wl"}]];
+Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYFormatting.wl"}]];
 
 $rayHelpRows=Join[$rayHelpRows,{
   {"RAYRaw[RAYRicci[dd]]","Raw form of a complete RAY geometry call."},
