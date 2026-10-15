@@ -1,6 +1,6 @@
 # RAY — Relativity and Geometry Toolkit
 
-> **Version 1.1.2 — notebook presentation update.**  
+> **Version 1.2.0 — symbolic d+n warped geometry.**  
 > **RAY is under active development.** APIs, performance characteristics, and higher-level abstractions may evolve as the package grows.
 
 **RAY** is a Wolfram Language package for explicit-component tensor geometry, general relativity, and Raychaudhuri kinematics.
@@ -9,6 +9,30 @@
 
 RAY is designed around a simple workflow: define an explicit metric matrix and coordinates, optionally define a congruence $u^\mu$, and then query curvature, invariants, kinematics, mixed-index tensors, nonzero components, or a complete report using compact commands.
 
+
+## Fully symbolic d+n warped products (v1.2.0)
+
+**New:** exact symbolic Ricci, Einstein and field equations with external spacetime dimension **d** and internal dimension **n** left unassigned. This does not build a finite matrix of symbolic size. The exact formulas hold for time-orthogonal warped products with time-independent intrinsic spatial reference metrics.
+
+~~~mathematica
+ClearAll[d,n,t,A,B];
+
+g=RAYGeneralWarpedMetric[d,n,A[t],B[t],
+ "Time"->t,"InternalGeometry"->"General"];
+
+g["TotalDimension"]                (* d+n *)
+g["RicciTimeTime"] // RAYReadable
+g["RicciScalar"] // RAYReadable
+g["EinsteinTimeTime"] // RAYReadable
+g["Blocks"][[2,"RicciTensor"]] // RAYPretty
+RAYWarpedReport[g]
+~~~
+
+Supports arbitrary internal Ricci tensors, constant curvature, Einstein reference metrics, a nontrivial lapse and any number of warped spatial blocks. The new RAYWarpedFieldEquations handles Lambda plus homogeneous energy density and block pressures while retaining tensor constraints on non-Einstein blocks. RAYWarpedToComponents specializes integer dimensions into the older component geometry engine.
+
+**Complete derivations, scope and examples:** [SYMBOLIC_DN_GUIDE.md](SYMBOLIC_DN_GUIDE.md). **Executable checks:** Tests/RAY_SymbolicWarped_Tests.wl (82 new cases).
+
+---
 
 ## Development branch: matter, equations, numerics and symbolic tools
 
@@ -710,7 +734,7 @@ RAY is released under the **MIT License**. See [`LICENSE`](LICENSE).
 
 ## Project status
 
-**Version:** 1.1.2  
+**Version:** 1.2.0  
 **Status:** under active development  
 **Language:** Wolfram Language  
 **Primary focus:** explicit-component tensor geometry, general relativity, and Raychaudhuri kinematics
