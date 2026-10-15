@@ -30,7 +30,7 @@ rayWarpGeometry[geometry_,dim_,name_] := Module[
 ];
 
 rayWarpTime[specs_,lapse_,time_] := Module[{candidates},
- If[Head[time]===Symbol,Return[time]];
+ If[time=!=Automatic && Head[time]===Symbol,Return[time]];
  If[time=!=Automatic,Return[$Failed]];
  candidates=Cases[{specs[[All,3]],lapse},
      HoldPattern[f_Symbol[z_Symbol]] /; f=!=Exp :> z,Infinity];
@@ -103,7 +103,6 @@ RAYWarpedBlocks[specs_List,OptionsPattern[]] := Module[
    "Assumptions"->ass|>
 ];
 
-Options[RAYGeneralWarpedMetric]=Options[RAYWarpedBlocks];
 Options[RAYGeneralWarpedMetric]=Join[
   Options[RAYWarpedBlocks],{"ExternalGeometry"->"Flat",
    "InternalGeometry"->"General"}];
