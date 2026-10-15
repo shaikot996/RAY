@@ -35,9 +35,68 @@ rayPrettyScript[indices_List,form_] := Module[
  }
 ];
 
+
+rayPrettyGeometryLabel[name_String] := Switch[name,
+ "External","ext","Internal","int","Fiber","fib",_,name];
+
+rayPrettyTensorBase[name_String] := Module[{geometry,type},
+ geometry=Which[
+  StringStartsQ[name,"External"],"External",
+  StringStartsQ[name,"Internal"],"Internal",
+  StringStartsQ[name,"Fiber"],"Fiber",
+  True,None];
+ If[geometry===None,
+  Return[StyleBox[rayPrettyTensorName[name],FontSlant->"Italic"]]];
+ type=StringDrop[name,StringLength[geometry]];
+ If[!MemberQ[{"Metric","Ricci","Einstein","Riemann","Weyl"},type],
+  Return[StyleBox[name,FontSlant->"Italic"]]];
+ SuperscriptBox[
+   OverscriptBox[
+    StyleBox[Switch[type,"Metric","g","Einstein","G","Weyl","C",_,"R"],
+      FontSlant->"Italic"],"~"],
+   rayPrettyGeometryLabel[geometry]]
+];
+
+RAYIntrinsicScalar /: MakeBoxes[RAYIntrinsicScalar[name_String],
+ form:(StandardForm|TraditionalForm)] :=
+ With[{pretty=SubscriptBox[OverscriptBox["R","~"],
+     rayPrettyGeometryLabel[name]]},
+  InterpretationBox[pretty,RAYIntrinsicScalar[name],Editable->False]];
+
+RAYCovariantHessian /: MakeBoxes[
+ RAYCovariantHessian[expression_,i_,j_],
+ form:(StandardForm|TraditionalForm)] :=
+ With[{pretty=RowBox[{
+  SubscriptBox["\[Del]",rayPrettyIndexBoxes[
+    If[MatchQ[i,_RAYDown|_RAYUp],First[i],i],form]],
+  SubscriptBox["\[Del]",rayPrettyIndexBoxes[
+    If[MatchQ[j,_RAYDown|_RAYUp],First[j],j],form]],
+  "(",MakeBoxes[expression,form],")"}]},
+  InterpretationBox[pretty,RAYCovariantHessian[expression,i,j],
+    Editable->False]];
+
+RAYCovariantBox /: MakeBoxes[RAYCovariantBox[expression_],
+ form:(StandardForm|TraditionalForm)] :=
+ With[{pretty=RowBox[{"\[EmptySquare]","(",
+   MakeBoxes[expression,form],")"}]},
+  InterpretationBox[pretty,RAYCovariantBox[expression],Editable->False]];
+
+RAYGradientNorm /: MakeBoxes[RAYGradientNorm[expression_],
+ form:(StandardForm|TraditionalForm)] :=
+ With[{pretty=SuperscriptBox[
+  RowBox[{"(", "\[Del]",MakeBoxes[expression,form],")"}],"2"]},
+  InterpretationBox[pretty,RAYGradientNorm[expression],Editable->False]];
+
+RAYPartialD /: MakeBoxes[RAYPartialD[expression_,index_],
+ form:(StandardForm|TraditionalForm)] :=
+ With[{pretty=RowBox[{
+    SubscriptBox["\[PartialD]",rayPrettyIndexBoxes[index,form]],
+    "(",MakeBoxes[expression,form],")"}]},
+  InterpretationBox[pretty,RAYPartialD[expression,index],Editable->False]];
+
 rayPrettyTensorBoxes[name_String,indices_List,form_] := Module[
  {base,up,down,output,valid},
- base=StyleBox[rayPrettyTensorName[name],FontSlant->"Italic"];
+ base=rayPrettyTensorBase[name];
  valid=AllTrue[indices,MatchQ[#,_RAYUp|_RAYDown]&];
  If[!valid,
    Return[RowBox[{"RAYTensor","[",

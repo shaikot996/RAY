@@ -10,7 +10,7 @@
 Under **Releases → Assets**, you can also download the versioned standalone ZIP and its SHA-256 checksums. The RAYStandalone.wl asset is the complete Wolfram Language package in one file; no installation/build compilation is needed.
 
 
-> **Version 1.2.0 — symbolic d+n warped geometry.**  
+> **Version 1.2.1 — coordinate-covariant warped geometry.**  
 > **RAY is under active development.** APIs, performance characteristics, and higher-level abstractions may evolve as the package grows.
 
 **RAY** is a Wolfram Language toolkit for explicit-component tensor geometry, general relativity, Raychaudhuri kinematics and dimension-independent curvature of time-warped product geometries.
@@ -19,6 +19,33 @@ Under **Releases → Assets**, you can also download the versioned standalone ZI
 
 RAY is designed around a simple workflow: define an explicit metric matrix and coordinates, optionally define a congruence $u^\mu$, and then query curvature, invariants, kinematics, mixed-index tensors, nonzero components, or a complete report using compact commands.
 
+
+## Coordinate-covariant warped geometry (v1.2.1)
+
+**Correctness safeguard:** time-only symbolic warp calculations now reject A[t,x], B[t,x] and multivariable lapse functions; otherwise spatial derivative terms would be missing. To distinguish coordinates from genuine constant symbolic coefficients, list constant coefficients explicitly using "Parameters"->{c1,c2} in the time-only API. The new coordinate-covariant API supports a general d-dimensional base metric (with explicit integer d coordinates) and a fiber dimension n that remains symbolic.
+
+~~~mathematica
+ClearAll[d,n,t,x,A,B,sigma];
+abstract = RAYAbstractWarpedCurvature[d,n,B[t,x]];
+abstract["RicciScalar"] // RAYPretty
+
+baseMetric = DiagonalMatrix[{-Exp[sigma[t]],Exp[2A[t,x]]}];
+model = RAYCovariantWarpedMetric[
+ "WarpedExample",{t,x},baseMetric,n,B[t,x],
+ "IntrinsicGeometry"->"General"];
+model["WarpCovariantHessian"] // MatrixForm
+model["FullBaseRicciTensor"] // MatrixForm
+model["FullFiberRicciTensor"] // RAYPretty
+model["FullRicciScalar"] // RAYReadable
+
+RAYWeylRescale[d,B[t,x]]["RicciScalar"] // RAYReadable
+~~~
+
+The covariant Hessian includes Christoffel terms; partial and covariant derivatives have separate notation. Intrinsic Ricci tensors render with tildes. Partial derivative fractions are the default; use RAYReadable[expr,"DerivativeNotation"->"Dot"] for optional time dots.
+
+[Notebook examples](Examples/RAY_CovariantWarped_Example.wl) · [v1.2.1 release notes](RELEASE_NOTES_v1.2.1.md). Verification: **278/278 Wolfram kernel tests passed**, including independent full 3D/4D Ricci tensors and 3D Weyl curvature.
+
+---
 
 ## Fully symbolic d+n warped products (v1.2.0)
 

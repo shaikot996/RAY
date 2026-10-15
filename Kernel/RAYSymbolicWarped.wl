@@ -7,7 +7,8 @@
    All formulas are exact for Levi-Civita warped products. *)
 
 Options[RAYWarpedBlocks]={"Time"->Automatic,"Lapse"->1,
- "Assumptions"->True,"Simplification"->"Simplify"};
+ "Assumptions"->True,"Simplification"->"Simplify",
+ "Parameters"->{}};
 
 rayWarpSpecQ[spec_] := MatchQ[spec,{_String,_,_,_}];
 
@@ -38,9 +39,22 @@ rayWarpTime[specs_,lapse_,time_] := Module[{candidates},
  If[Length[candidates]===1,First[candidates],$Failed]
 ];
 
+
+(* The symbolic Hubble-block formulas assume that each warp is a function
+   of the common time alone. Reject multivariable coordinate-dependent
+   functions instead of silently dropping their spatial gradients.
+   Bare symbols are parameters unless users supply separate coordinates. *)
+rayWarpTimeOnlyQ[warp_,time_Symbol,parameters_List:{}] :=
+ Module[{symbols},
+  symbols=DeleteDuplicates@Cases[HoldComplete[warp],
+    s_Symbol /; Context[s]=!="System`" :> s,Infinity];
+  Complement[symbols,Join[{time},parameters]]==={}
+ ];
+
+
 RAYWarpedBlocks[specs_List,OptionsPattern[]] := Module[
  {time,lapse=OptionValue["Lapse"],ass=OptionValue["Assumptions"],
-  mode=OptionValue["Simplification"],simple,geom,dimensions,warps,
+  mode=OptionValue["Simplification"],parameters=OptionValue["Parameters"],simple,geom,dimensions,warps,
   H,Hdot,sumH,sumH2,curvTerm,timeRic,scalar,einTime,blocks,
   spatialRic,EinCoeffs,coords,vol},
  If[specs==={}||!AllTrue[specs,rayWarpSpecQ],
@@ -55,6 +69,13 @@ RAYWarpedBlocks[specs_List,OptionsPattern[]] := Module[
  time=rayWarpTime[specs,lapse,OptionValue["Time"]];
  If[time===$Failed,
    Return[rayFail["RAYWarpedBlocks: specify \"Time\"->t or use a single time variable in all warps."]]];
+ If[!ListQ[parameters] || !AllTrue[parameters,MatchQ[#,_Symbol]&],
+  Return[rayFail["RAYWarpedBlocks: \"Parameters\" must be a list of constant parameter symbols."]]];
+ If[!AllTrue[warps,rayWarpTimeOnlyQ[#,time,parameters]&] ||
+   !rayWarpTimeOnlyQ[lapse,time,parameters],
+  Return[rayFail[
+   "RAYWarpedBlocks: warp factors and lapse must depend on time only. For spatial coordinate dependence, use RAYCovariantWarpedMetric; for constant symbolic coefficients explicitly supply \"Parameters\"->{c1,c2}."
+  ]]];
  geom=Map[rayWarpGeometry[#[[4]],#[[2]],#[[1]]]&,specs];
  If[MemberQ[geom,$Failed],
    Return[rayFail["RAYWarpedBlocks: geometry must be Flat, General, {General,R}, {Einstein,lambda}, or {ConstantCurvature,K}."]]];
@@ -119,7 +140,8 @@ RAYGeneralWarpedMetric[d_,n_,extWarp_,intWarp_,OptionsPattern[]] :=
  RAYWarpedBlocks[specs,
   "Time"->OptionValue["Time"],"Lapse"->OptionValue["Lapse"],
   "Assumptions"->OptionValue["Assumptions"],
-  "Simplification"->OptionValue["Simplification"]]
+  "Simplification"->OptionValue["Simplification"],
+  "Parameters"->OptionValue["Parameters"]]
 ];
 
 (* Instantiate a symbolic model at fixed INTEGER block dimensions by
