@@ -189,6 +189,26 @@ RAYPlot::usage = "RAYPlot[solution,quantities] plots multiple numerical solution
 
 RAYSolveWizard::usage = "RAYSolveWizard[equations,fields,timeDomain] opens interactive front-end input for ICs and plotting.";
 
+RAYUp::usage = "RAYUp[i] marks an upper abstract index.";
+
+RAYDown::usage = "RAYDown[i] marks a lower abstract index.";
+
+RAYDummy::usage = "RAYDummy[n] is an internal normalized dummy-index label.";
+
+RAYDeclareSymmetry::usage = "RAYDeclareSymmetry[name,kind] sets tensor slot symmetry (symmetric or antisymmetric).";
+
+RAYCanonicalize::usage = "RAYCanonicalize[expr] canonicalizes declared tensor symmetries and dummy labels.";
+
+RAYContract::usage = "RAYContract[expr] contracts metric, Kronecker delta and Ricci expressions.";
+
+RAYIndexCheck::usage = "RAYIndexCheck[expr] checks free/repeated abstract indices.";
+
+RAYBianchiReduce::usage = "RAYBianchiReduce[expr] applies first Bianchi identity for covariant Riemann.";
+
+RAYCovDCommutator::usage = "RAYCovDCommutator[tensor,a,b] forms [nabla_a,nabla_b] from Riemann.";
+
+RAYToComponents::usage = "RAYToComponents[expr,free] evaluates indexed tensors against the active explicit metric.";
+
 Begin["`Private`"];
 
 $RAYVersion = "1.0.0";
@@ -1402,6 +1422,7 @@ Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYRawExtensions.wl"}]];
 Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYMatter.wl"}]];
 Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYNumerics.wl"}]];
 Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYSymbolic.wl"}]];
+Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYAbstractAlgebra.wl"}]];
 
 $rayHelpRows=Join[$rayHelpRows,{
   {"RAYRaw[RAYRicci[dd]]","Raw form of a complete RAY geometry call."},
