@@ -63,6 +63,30 @@ RAYIntrinsicScalar /: MakeBoxes[RAYIntrinsicScalar[name_String],
      rayPrettyGeometryLabel[name]]},
   InterpretationBox[pretty,RAYIntrinsicScalar[name],Editable->False]];
 
+RAYCovariantHessian /: MakeBoxes[
+ RAYCovariantHessian[expression_,i_,j_],
+ form:(StandardForm|TraditionalForm)] :=
+ With[{pretty=RowBox[{
+  SubscriptBox["\[Del]",rayPrettyIndexBoxes[
+    If[MatchQ[i,_RAYDown|_RAYUp],First[i],i],form]],
+  SubscriptBox["\[Del]",rayPrettyIndexBoxes[
+    If[MatchQ[j,_RAYDown|_RAYUp],First[j],j],form]],
+  "(",MakeBoxes[expression,form],")"}]},
+  InterpretationBox[pretty,RAYCovariantHessian[expression,i,j],
+    Editable->False]];
+
+RAYCovariantBox /: MakeBoxes[RAYCovariantBox[expression_],
+ form:(StandardForm|TraditionalForm)] :=
+ With[{pretty=RowBox[{"\[EmptySquare]","(",
+   MakeBoxes[expression,form],")"}]},
+  InterpretationBox[pretty,RAYCovariantBox[expression],Editable->False]];
+
+RAYGradientNorm /: MakeBoxes[RAYGradientNorm[expression_],
+ form:(StandardForm|TraditionalForm)] :=
+ With[{pretty=SuperscriptBox[
+  RowBox[{"(", "\[Del]",MakeBoxes[expression,form],")"}],"2"]},
+  InterpretationBox[pretty,RAYGradientNorm[expression],Editable->False]];
+
 RAYPartialD /: MakeBoxes[RAYPartialD[expression_,index_],
  form:(StandardForm|TraditionalForm)] :=
  With[{pretty=RowBox[{
