@@ -99,7 +99,7 @@ formatChecks={
    True,TestID->"18-roundtrip-polynomial"
  ],
  VerificationTest[
-   Head[RAW[RAYTensor["A",{RAYUp[i]}]]]===InputForm,
+   SameQ[Head[RAW[RAYTensor["A",{RAYUp[i]}]]],Head[RAW[0]]],
    True,TestID->"19-RAW-head"
  ],
  VerificationTest[
@@ -108,23 +108,22 @@ formatChecks={
    True,TestID->"20-RAW-syntax"
  ],
  VerificationTest[
-   SameQ[RAW[TraditionalForm[1+a]],InputForm[1+a]],
+   SameQ[First[RAW[TraditionalForm[1+a]]],1+a],
    True,TestID->"21-RAW-traditional"
  ],
  VerificationTest[
-   SameQ[RAW[MatrixForm[{{1,2},{3,4}}]],InputForm[{{1,2},{3,4}}]],
+   SameQ[First[RAW[MatrixForm[{{1,2},{3,4}}]]],{{1,2},{3,4}}],
    True,TestID->"22-RAW-matrix"
  ],
  VerificationTest[
-   SameQ[RAW[TraditionalForm[MatrixForm[{{1,2}}]]],
-       InputForm[{{1,2}}]],True,TestID->"23-RAW-nested"
+   SameQ[First[RAW[TraditionalForm[MatrixForm[{{1,2}}]]]],{{1,2}}],True,TestID->"23-RAW-nested"
  ],
  VerificationTest[
-   SameQ[RAW[TableForm[{{a,b}}]],InputForm[{{a,b}}]],
+   SameQ[First[RAW[TableForm[{{a,b}}]]],{{a,b}}],
    True,TestID->"24-RAW-table"
  ],
  VerificationTest[
-   Head[RAYPretty[RAYTensor["A",{RAYDown[a]}]]]===TraditionalForm,
+   Head[RAYPretty[RAYTensor["A",{RAYDown[a]}]]]===Head[RAYReadable[1]],
    True,TestID->"25-pretty-form"
  ],
  VerificationTest[
@@ -151,12 +150,11 @@ formatChecks={
      RAYDefineMetric["FormattingFlat",{t,x},
         DiagonalMatrix[{-1,1}]];
      g=RAW[RAYMetric["dd"]];
-     SameQ[g,InputForm[DiagonalMatrix[{-1,1}]]]
+     SameQ[First[g],DiagonalMatrix[{-1,1}]]
    ],True,TestID->"29-RAW-existing-display-API"
  ],
  VerificationTest[
-   SameQ[RAYRicci["dd"]//RAW,
-     InputForm[RAYRaw["Ricci","dd"]]],
+   SameQ[First[RAYRicci["dd"]//RAW],RAYRaw["Ricci","dd"]],
    True,TestID->"30-RAW-existing-Ricci"
  ],
  VerificationTest[
@@ -173,12 +171,12 @@ formatChecks={
    True,TestID->"32-no-part-artifacts"
  ],
  VerificationTest[
-   SameQ[RAW[RAYPretty[RAYTensor["A",{RAYUp[i]}]]],
-      InputForm[RAYTensor["A",{RAYUp[i]}]]],
+   SameQ[First[RAW[RAYPretty[RAYTensor["A",{RAYUp[i]}]]]],
+      RAYTensor["A",{RAYUp[i]}]],
    True,TestID->"33-RAW-pretty"
  ],
  VerificationTest[
-   SameQ[RAW[InputForm[a+b]],InputForm[a+b]],
+   SameQ[First[RAW[InputForm[a+b]]],a+b],
    True,TestID->"34-RAW-idempotent"
  ],
  VerificationTest[

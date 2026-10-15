@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.2 — 2026-10-15
+
+- Display Ricci and Einstein tensors as labeled nonzero coordinate components by default rather than oversized matrices.
+- Add handwritten dot notation for time derivatives and partial-derivative fraction notation for internal metric functions.
+- Keep `RAYRicci["dd","Matrix"]` and `RAYEinstein["dd","Matrix"]` for full matrix output.
+- Update `expr // RAW` to Mathematica notebook-style input notation (`A'[t]` instead of `Derivative[1][A][t]`), preserving exact expressions via InterpretationBox.
+- Add `RAYReadable` and `RAYReadableTensor` for explicit readable formatting, plus the general output improvements.
+- Run 35 handwritten tests, 35 formatting tests, 18 regressions and 62 functional benchmarks: 150/150 pass in Wolfram Language 15.
+
+
+
 ## 1.1.1 — 2026-10-15
 
 - Abstract tensors, abstract indices, covariant derivatives and internal dummy indices now typeset automatically in Wolfram notebooks using editable InterpretationBox output.
