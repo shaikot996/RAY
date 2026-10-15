@@ -139,6 +139,28 @@ AppendTo[tests,VerificationTest[
  FullSimplify[full4Ric[[1;;2,3;;4]],Assumptions->0<y<Pi],
  ConstantArray[0,{2,2}],TestID->"4D-mixed-base-fiber"]];
 
+
+(* Independent 3D Weyl rescaling check from a flat metric. *)
+RAYDefineMetric["Weyl3D",{t,x,y},
+ Exp[2omega[t,x]]DiagonalMatrix[{-1,1,1}]];
+weylRic=RAYRaw["Ricci","dd"];
+weylScalar=RAYRaw["RicciScalar"];
+wGrad={D[omega[t,x],t],D[omega[t,x],x],0};
+wHess=Table[D[omega[t,x],{t,x,y}[[i]],
+  {t,x,y}[[j]]],{i,3},{j,3}];
+wBox=-D[omega[t,x],{t,2}]+D[omega[t,x],{x,2}];
+wNorm=-wGrad[[1]]^2+wGrad[[2]]^2;
+weylRicExpected=-wHess-DiagonalMatrix[{-1,1,1]]wBox+
+ Outer[Times,wGrad,wGrad]-DiagonalMatrix[{-1,1,1]]wNorm;
+weylScalarExpected=Exp[-2omega[t,x]](-4wBox-2wNorm);
+
+AppendTo[tests,VerificationTest[
+ FullSimplify[weylScalar-weylScalarExpected],
+ 0,TestID->"3D-conformal-scalar-independent"]];
+AppendTo[tests,VerificationTest[
+ FullSimplify[weylRic-weylRicExpected],
+ ConstantArray[0,{3,3}],TestID->"3D-conformal-tensor-independent"]];
+
 rep=TestReport[tests];
 covSummary=<|"Total"->Length[tests],
  "Pass"->Length[rep[[1]]["TestsSucceededKeys"]],
