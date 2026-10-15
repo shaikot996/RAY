@@ -56,7 +56,7 @@ RAYHandwritten /: MakeBoxes[RAYHandwritten[expr_],
  Module[{pretty,box},
    pretty=rayHandExpression[expr];
    box=MakeBoxes[pretty,TraditionalForm];
-   InterpretationBox[box,expr,Editable->False]
+   With[{rendered=box},InterpretationBox[rendered,expr,Editable->False]]
  ];
 
 rayReadableComponentLabel[name_String,config_String,indices_List] :=
@@ -107,7 +107,7 @@ RAYComponentDisplay /: MakeBoxes[
      ColumnAlignments->{"Right","Center","Left"},
      RowSpacings->1.4,ColumnSpacings->1.3]
   ];
-  InterpretationBox[boxes,data,Editable->False]
+  With[{rendered=boxes},InterpretationBox[rendered,data,Editable->False]]
  ];
 
 RAYReadableTensor[array_List,name_String:"Tensor",
