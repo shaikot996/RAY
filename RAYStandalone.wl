@@ -1,4 +1,4 @@
-(* RAY standalone v1.2.0 — explicit and dimension-independent symbolic warped products. *)
+(* RAY standalone v1.2.0 — exact symbolic d+n warped blocks and field equations. *)
 
 (* ::Package:: *)
 
@@ -232,6 +232,8 @@ RAYWarpedToComponents::usage = "RAYWarpedToComponents[model,name,{{coords,refere
 RAYWarpedReport::usage = "RAYWarpedReport[model] displays general warped-product Ricci/Einstein formulas as a readable physics report.";
 
 RAYIntrinsicScalar::usage = "RAYIntrinsicScalar[name] is an inert placeholder for the intrinsic scalar curvature of an unspecified spatial reference metric.";
+
+RAYWarpedFieldEquations::usage = "RAYWarpedFieldEquations[model,source] derives Einstein equations with Lambda and homogeneous energy density/pressures for symbolic d+n blocks, retaining full tensor equations for non-Einstein reference geometries.";
 
 Begin["`Private`"];
 
@@ -2957,11 +2959,76 @@ RAYWarpedReport[model_Association] :=
   },Spacings->1]
  ];
 
+
+(* Einstein equations for comoving homogeneous diagonal matter.
+   T_tt = lapse^2 rho,  T^(i)_ab = p_i Exp[2 a_i] h^(i)_ab.
+   General intrinsic reference geometry is not automatically Einstein;
+   preserve its full tensor equation as well as the scalar trace. *)
+Options[RAYWarpedFieldEquations]={
+ "Coupling"->1,"CosmologicalConstant"->0,
+ "Simplification"->"Simplify"};
+RAYWarpedFieldEquations[model_Association,source_:Automatic,OptionsPattern[]] :=
+ Module[{blocks=Lookup[model,"Blocks",{}],rho=0,pressures,
+  coupling=OptionValue["Coupling"],lambda=OptionValue["CosmologicalConstant"],
+  timeRes,spatial,vars,curv,coeff,scalarPart,res,tensorRes,
+  nsp,mode=OptionValue["Simplification"],simp},
+ If[Lookup[model,"Type",None]=!="SymbolicWarpedBlocks",
+   Return[rayFail["RAYWarpedFieldEquations: expected a symbolic warped-block model."]]];
+ nsp=Length[blocks];
+ If[source===Automatic,
+   pressures=ConstantArray[0,nsp],
+   If[!AssociationQ[source],
+     Return[rayFail["RAYWarpedFieldEquations: source must be an Association or Automatic."]]];
+   rho=Lookup[source,"EnergyDensity",0];
+   pressures=Lookup[source,"Pressures",ConstantArray[0,nsp]];
+   If[AssociationQ[pressures],
+     If[!AllTrue[blocks,KeyExistsQ[pressures,#["Name"]]&],
+       Return[rayFail["RAYWarpedFieldEquations: missing a pressure for one or more named blocks."]]];
+     pressures=Lookup[pressures,blocks[[All,"Name"]]]];
+   If[!ListQ[pressures]||Length[pressures]=!=nsp,
+     Return[rayFail["RAYWarpedFieldEquations: one pressure per block is required."]]]
+ ];
+ simp=Switch[mode,
+   "None",Function[q,q],
+   "Full",Function[q,FullSimplify[q,model["Assumptions"]]],
+   _,Function[q,Simplify[q,model["Assumptions"]]]];
+ timeRes=simp[model["EinsteinTimeTime"]-
+    model["Lapse"]^2(lambda+coupling rho)];
+ spatial=Table[
+   vars=blocks[[k]];curv=vars["Geometry"];
+   coeff=Switch[curv,
+      "Flat",0,
+      {"ConstantCurvature",_},(vars["Dimension"]-1)curv[[2]],
+      {"Einstein",_},curv[[2]],
+      _,Missing["NonEinstein"]];
+   scalarPart=simp[vars["EinsteinCoefficient"]+
+      Exp[-2vars["Warp"]]vars["IntrinsicRicciScalar"]/vars["Dimension"]+
+      lambda-coupling pressures[[k]]];
+   tensorRes=simp[vars["EinsteinTensor"]+
+      Exp[2 vars["Warp"]](lambda-coupling pressures[[k]])vars["ReferenceMetric"]];
+   res=If[MissingQ[coeff],tensorRes,
+     simp[Exp[-2vars["Warp"]]coeff+
+       vars["EinsteinCoefficient"]+lambda-coupling pressures[[k]]]];
+   <|"Name"->vars["Name"],
+     "EquationType"->If[MissingQ[coeff],"FullTensor","Scalar"],
+     "Equation"->(res==0),
+     "Residual"->res,
+     "TraceResidual"->scalarPart,
+     "TensorResidual"->tensorRes|>,
+   {k,nsp}];
+ <|"Type"->"WarpedEinsteinEquations",
+   "TimeTime"->(timeRes==0),"TimeTimeResidual"->timeRes,
+   "Spatial"->spatial,"Coupling"->coupling,
+   "CosmologicalConstant"->lambda,
+   "EnergyDensity"->rho,"Pressures"->pressures|>
+];
+
 $rayHelpRows=Join[$rayHelpRows,{
  {"RAYGeneralWarpedMetric[d,n,A[t],B[t]]","Exact Ricci and Einstein formulas with symbolic d,n; time lapse and spatial curvature configurable."},
  {"RAYWarpedBlocks[{{name,m,a[t],geometry},...}]","Dimension-independent warped product with any number of time-dependent spatial factors."},
  {"RAYWarpedToComponents[model,name,blocks]","Specialize integer block dimensions into the existing explicit metric engine."},
  {"RAYWarpedReport[model]","Readable symbolic Ricci/Einstein formulas and block descriptions."},
+ {"RAYWarpedFieldEquations[model,source]","Einstein equations with Lambda and comoving rho, p_i; retains full tensor equations for non-Einstein blocks."},
  {"RAYIntrinsicScalar[name]","Placeholder for an unspecified intrinsic scalar curvature of a spatial reference metric."}
 }];
 
