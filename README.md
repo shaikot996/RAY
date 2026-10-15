@@ -22,7 +22,7 @@ RAY is designed around a simple workflow: define an explicit metric matrix and c
 
 ## Coordinate-covariant warped geometry (v1.2.1)
 
-**Correctness safeguard:** time-only symbolic warp calculations now reject A[t,x], B[t,x] and multivariable lapse functions; otherwise spatial derivative terms would be missing. The new coordinate-covariant API supports a general d-dimensional base metric (with explicit integer d coordinates) and a fiber dimension n that remains symbolic.
+**Correctness safeguard:** time-only symbolic warp calculations now reject A[t,x], B[t,x] and multivariable lapse functions; otherwise spatial derivative terms would be missing. To distinguish coordinates from genuine constant symbolic coefficients, list constant coefficients explicitly using "Parameters"->{c1,c2} in the time-only API. The new coordinate-covariant API supports a general d-dimensional base metric (with explicit integer d coordinates) and a fiber dimension n that remains symbolic.
 
 ~~~mathematica
 ClearAll[d,n,t,x,A,B,sigma];
@@ -43,7 +43,7 @@ RAYWeylRescale[d,B[t,x]]["RicciScalar"] // RAYReadable
 
 The covariant Hessian includes Christoffel terms; partial and covariant derivatives have separate notation. Intrinsic Ricci tensors render with tildes. Partial derivative fractions are the default; use RAYReadable[expr,"DerivativeNotation"->"Dot"] for optional time dots.
 
-[Notebook examples](Examples/RAY_CovariantWarped_Example.wl) · [v1.2.1 release notes](RELEASE_NOTES_v1.2.1.md). Verification: **273/273 Wolfram kernel tests passed**, including independent full 3D/4D Ricci tensors and 3D Weyl curvature.
+[Notebook examples](Examples/RAY_CovariantWarped_Example.wl) · [v1.2.1 release notes](RELEASE_NOTES_v1.2.1.md). Verification: **278/278 Wolfram kernel tests passed**, including independent full 3D/4D Ricci tensors and 3D Weyl curvature.
 
 ---
 
