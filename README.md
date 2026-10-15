@@ -1,6 +1,6 @@
 # RAY — Relativity and Geometry Toolkit
 
-> **Version 1.0.0 — initial public development release.**  
+> **Version 1.1.0 — extended development release.**  
 > **RAY is under active development.** APIs, performance characteristics, and higher-level abstractions may evolve as the package grows.
 
 **RAY** is a Wolfram Language package for explicit-component tensor geometry, general relativity, and Raychaudhuri kinematics.
@@ -8,6 +8,19 @@
 **Tagline:** *Explicit-component tensor geometry and relativity for Wolfram Language.*
 
 RAY is designed around a simple workflow: define an explicit metric matrix and coordinates, optionally define a congruence $u^\mu$, and then query curvature, invariants, kinematics, mixed-index tensors, nonzero components, or a complete report using compact commands.
+
+
+## Development branch: matter, equations, numerics and symbolic tools
+
+The v1.1 API extends the explicit-component toolkit with:
+
+- direct raw expressions from full calls such as `RAYRaw[RAYRicci["dd"]]`;
+- scalar/Maxwell and general algebraic inverse-metric matter Lagrangians, with Hilbert stress tensors;
+- `RAYEinsteinEquations` with vacuum default and configurable cosmological constant/coupling;
+- `RAYSolve`, `RAYPlot` and a front-end `RAYSolveWizard` for multiple initial conditions;
+- `RAYCovD`, `RAYWarpedMetric`, formal `RAYSymbolicMetric`, and `RAYConventions[]`.
+
+See **[DEVELOPMENT_API.md](DEVELOPMENT_API.md)** for examples, detailed options, and the boundary between implemented component calculations and the future xAct-level symbolic engine. Run `Tests/RAY_Development_Tests.wl` for the new regression cases. The documented APIs are included in v1.1.0 on the main branch.
 
 ## Current scope
 
@@ -36,6 +49,26 @@ RAY currently provides:
 - raw symbolic output for further algebra.
 
 The Raychaudhuri implementation uses expanded definitions built directly from covariant derivatives, the metric, the congruence, and acceleration. It does **not** explicitly introduce a spatial-projector tensor in the shear/vorticity implementation.
+
+---
+
+## Single-file installation (Windows, Linux, macOS)
+
+Download **[RAYStandalone.wl](RAYStandalone.wl)**. This is the entire package bundled into a single Wolfram Language file. Open Mathematica and run:
+
+~~~mathematica
+Get["C:\\Users\\YourUser\\Downloads\\RAYStandalone.wl"]
+RAYVersion
+RAYHelp[]
+~~~
+
+Replace the path with the actual location. No other RAY package files are required.
+
+If you prefer the conventional application installation, download the **whole repository** (including the Kernel folder) and follow the steps below. Only that form is loaded through Needs["RAY`"] by default.
+
+The extended API is described in [DEVELOPMENT_API.md](DEVELOPMENT_API.md), and [release notes](RELEASE_NOTES_v1.1.0.md) explain the implemented and still-experimental parts.
+
+**Kernel verification:** 7 original regression tests, 11 development tests and 62 timed benchmark cases passed (80/80). Run Tests/RAY_Benchmarks.wl for reproducible functional benchmarks; GUI wizard interaction requires a local Mathematica front end.
 
 ---
 
@@ -486,7 +519,7 @@ The metric itself carries the signature; RAY does not hard-code mostly-plus or m
 
 ## Development status
 
-**RAY 1.0.0 is the first public development release.**
+**RAY 1.1.0 adds matter variations, numerical workflows, and an initial abstract-index algebra layer.**
 
 The current release is intended to provide a clean explicit-component foundation. The project is actively evolving, and the present API should be regarded as usable but not yet frozen.
 
@@ -622,7 +655,7 @@ RAY is released under the **MIT License**. See [`LICENSE`](LICENSE).
 
 ## Project status
 
-**Version:** 1.0.0  
+**Version:** 1.1.0  
 **Status:** under active development  
 **Language:** Wolfram Language  
 **Primary focus:** explicit-component tensor geometry, general relativity, and Raychaudhuri kinematics

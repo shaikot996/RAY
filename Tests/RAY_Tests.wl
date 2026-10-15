@@ -188,12 +188,12 @@ tests = {
       ];
 
       {
-        vort2,
+        FullSimplify[vort2 - 2 om^2/(1 - om^2 r^2)^2],
         RAYRaw["RaychaudhuriResidual"]
       }
     ],
     {
-      2 om^2/(1 - om^2 r^2)^2,
+      0,
       0
     },
     TestID -> "Rotating congruence has nonzero vorticity"
