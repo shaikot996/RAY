@@ -150,7 +150,7 @@ wHess=Table[D[omega[t,x],{t,x,y}[[i]],
   {t,x,y}[[j]]],{i,3},{j,3}];
 wBox=-D[omega[t,x],{t,2}]+D[omega[t,x],{x,2}];
 wNorm=-wGrad[[1]]^2+wGrad[[2]]^2;
-weylRicExpected=-wHess-wBox*DiagonalMatrix[{-1,1,1]]+Outer[Times,wGrad,wGrad]-wNorm*DiagonalMatrix[{-1,1,1]];
+weylRicExpected=Plus[Times[-1,wHess],Times[-1,wBox,DiagonalMatrix[{-1,1,1}]],Outer[Times,wGrad,wGrad],Times[-1,wNorm,DiagonalMatrix[{-1,1,1}]]];
 weylScalarExpected=Exp[-2omega[t,x]]*(-4*wBox-2*wNorm);
 
 AppendTo[tests,VerificationTest[
