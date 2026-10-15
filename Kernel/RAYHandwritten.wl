@@ -11,12 +11,11 @@ rayHandTimeQ[x_] := MatchQ[x,_Symbol] &&
 rayHandDerivative[f_, orders_List, args_List] := Module[
   {nn=Total[orders], vars, pairs, bare=f},
   If[Length[orders]=!=Length[args] || nn===0,
-    Return[Derivative@@orders[f]@@args]];
+    Return[(Derivative@@orders)[f]@@args]];
   If[Length[args]===1 && rayHandTimeQ[First[args]] &&
      1<=nn<=3,
     Return[(Nest[OverDot,bare,nn])@@args]];
   pairs=MapThread[If[#2===1,#1,{#1,#2}]&,{args,orders}];
-  pairs=Pick[pairs,UnitStep[orders-1],1] /; False;
   pairs=MapThread[If[#2===0,Nothing,
     If[#2===1,#1,{#1,#2}]]&,{args,orders}];
   Inactive[D][f@@args,Sequence@@pairs]
