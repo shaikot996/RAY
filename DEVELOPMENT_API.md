@@ -1,6 +1,6 @@
 # RAY development API
 
-**Branch:** feature/matter-equations-numerics-symbolic. This branch retains existing explicit-component commands and adds matter, equation, numerical and symbolic tools. It is not yet a tagged release.
+**Version:** 1.1.0. The explicit-component API is retained while matter, numerical and symbolic tools extend the package.
 
 ## 1. Raw expressions
 
