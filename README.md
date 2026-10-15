@@ -1,5 +1,15 @@
 # RAY — Relativity and Geometry Toolkit
 
+[![Latest RAY build](https://img.shields.io/github/v/release/shaikot996/RAY?label=Standalone%20build)](https://github.com/shaikot996/RAY/releases/latest)
+[![Build and publish](https://github.com/shaikot996/RAY/actions/workflows/release-standalone.yml/badge.svg)](https://github.com/shaikot996/RAY/actions/workflows/release-standalone.yml)
+
+### Download RAY (ready to use)
+
+**[Download RAYStandalone.wl — latest stable build](https://github.com/shaikot996/RAY/releases/latest/download/RAYStandalone.wl)** · [All versions and release notes](https://github.com/shaikot996/RAY/releases) · [Quick installation guide](QUICKSTART.md)
+
+Under **Releases → Assets**, you can also download the versioned standalone ZIP and its SHA-256 checksums. The RAYStandalone.wl asset is the complete Wolfram Language package in one file; no installation/build compilation is needed.
+
+
 > **Version 1.2.0 — symbolic d+n warped geometry.**  
 > **RAY is under active development.** APIs, performance characteristics, and higher-level abstractions may evolve as the package grows.
 
@@ -78,7 +88,7 @@ The Raychaudhuri implementation uses expanded definitions built directly from co
 
 ## Single-file installation (Windows, Linux, macOS)
 
-Download **[RAYStandalone.wl](RAYStandalone.wl)**. This is the entire package bundled into a single Wolfram Language file. Open Mathematica and run:
+Download the **[latest RAYStandalone.wl release asset](https://github.com/shaikot996/RAY/releases/latest/download/RAYStandalone.wl)**. This is the entire package bundled into a single Wolfram Language file. Open Mathematica and run:
 
 ~~~mathematica
 Get["C:\\Users\\YourUser\\Downloads\\RAYStandalone.wl"]
