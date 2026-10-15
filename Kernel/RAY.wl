@@ -215,7 +215,7 @@ RAYUnregisterTensor::usage = "RAYUnregisterTensor[name] removes a user-defined c
 
 Begin["`Private`"];
 
-$RAYVersion = "1.0.0";
+$RAYVersion = "1.1.0";
 RAYVersion := $RAYVersion;
 
 $rayMetrics = <||>;
