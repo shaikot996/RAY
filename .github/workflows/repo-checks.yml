@@ -32,6 +32,8 @@ jobs:
           test -f Kernel/RAYSymbolicWarped.wl
           test -f Tests/RAY_SymbolicWarped_Tests.wl
           test -f SYMBOLIC_DN_GUIDE.md
+          test -f RELEASE_NOTES_v1.2.0.md
+          test -f Tests/check_standalone_consistency.py
           test -f Tests/RAY_Handwritten_Tests.wl
           test -f Tests/RAY_Formatting_Tests.wl
 
@@ -54,3 +56,6 @@ jobs:
 
       - name: Static Wolfram Language source checks
         run: python Tests/check_wl_structure.py
+
+      - name: Verify one-file distribution matches source modules
+        run: python Tests/check_standalone_consistency.py
