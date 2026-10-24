@@ -260,7 +260,7 @@ RAYUpdateStandalone::usage = "RAYUpdateStandalone[] downloads the latest release
 
 Begin["`Private`"];
 
-$RAYVersion = "1.3.0";
+$RAYVersion = "1.3.1";
 RAYVersion := $RAYVersion;
 
 $rayMetrics = <||>;
