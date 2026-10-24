@@ -5,12 +5,16 @@
 
 ### Download RAY (ready to use)
 
-**[Download RAYStandalone.wl — latest stable build](https://github.com/shaikot996/RAY/releases/latest/download/RAYStandalone.wl)** · [All versions and release notes](https://github.com/shaikot996/RAY/releases) · [Quick installation guide](QUICKSTART.md)
-
-Under **Releases → Assets**, you can also download the versioned standalone ZIP and its SHA-256 checksums. The RAYStandalone.wl asset is the complete Wolfram Language package in one file; no installation/build compilation is needed.
+**RAY.wl is now the single-file official build.** If the old updater reports SHA256 mismatch, download RAY.wl manually once, and subsequently run RAYUpdate[]. It installs to Wolfram Applications and verifies actual file bytes. The previous RAYUpdateStandalone[] name still works in v1.3.2+.
 
 
-> **Version 1.3.1 — exact constant-warp simplification.**  
+**[Download RAY.wl — latest stable build](https://github.com/shaikot996/RAY/releases/latest/download/RAY.wl)** · [All versions and release notes](https://github.com/shaikot996/RAY/releases) · [Quick installation guide](QUICKSTART.md)
+
+Under **Releases → Assets**, you can also download the versioned standalone ZIP and its SHA-256 checksums. The RAY.wl asset is the complete Wolfram Language package in one file; no installation/build compilation is needed.
+
+
+> **Version 1.3.2 — corrected raw-byte SHA256 updater and canonical RAY.wl.**  
+> [Install / repair in one file](QUICKSTART.md) · [v1.3.2 release notes](RELEASE_NOTES_v1.3.2.md)  
 > **RAY is under active development.** APIs, performance characteristics, and higher-level abstractions may evolve as the package grows.
 
 **RAY** is a Wolfram Language toolkit for explicit-component tensor geometry, general relativity, Raychaudhuri kinematics and dimension-independent curvature of time-warped product geometries.
@@ -176,10 +180,10 @@ The Raychaudhuri implementation uses expanded definitions built directly from co
 
 ## Single-file installation (Windows, Linux, macOS)
 
-Download the **[latest RAYStandalone.wl release asset](https://github.com/shaikot996/RAY/releases/latest/download/RAYStandalone.wl)**. This is the entire package bundled into a single Wolfram Language file. Open Mathematica and run:
+Download the **[latest RAY.wl release asset](https://github.com/shaikot996/RAY/releases/latest/download/RAY.wl)**. This is the entire package bundled into a single Wolfram Language file. Open Mathematica and run:
 
 ~~~mathematica
-Get["C:\\Users\\YourUser\\Downloads\\RAYStandalone.wl"]
+Get["C:\\Users\\YourUser\\Downloads\\RAY.wl"]
 RAYVersion
 RAYHelp[]
 ~~~
