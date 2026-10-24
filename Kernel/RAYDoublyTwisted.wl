@@ -101,6 +101,7 @@ RAYDoubleWarpedGeometry[d_,n_,A_,B_,OptionsPattern[]]:=Module[
   "WarpA"->A,"WarpB"->B,
   "ExternalWarp"->A,"InternalWarp"->B,
   "DerivativeForm"->form,
+  "CoordinateDependence"->"Unrestricted external and internal dependence for both scalar warp functions",
   "ConstantA"->ca,"ConstantB"->cb,
   "Metric"->"Exp[2 A(x,y)] hat[g](x) + Exp[2 B(x,y)] tilde[g](y)",
   "RicciExternal"->RE,"RicciInternal"->RI,"RicciMixed"->RM,
@@ -205,8 +206,6 @@ RAYDoubleWarpedToComponents[model_Association,name_String,
   href,tref,full,ret,derived,actual,rs,ein,block,verify,checks},
  If[Lookup[model,"Type",None]=!="GeneralDoubleWarpedGeometry",
   Return[rayFail["RAYDoubleWarpedToComponents: supply a general double warped model."]]];
- If[!IntegerQ[model["ExternalDimension"]]&&!NumericQ[model["ExternalDimension"]],
-  Null];
  If[!TrueQ[FullSimplify[model["ExternalDimension"]==d&&
       model["InternalDimension"]==n,ass]],
   Return[rayFail["RAYDoubleWarpedToComponents: reference coordinate sizes must match specified dimensions."]]];
@@ -222,6 +221,12 @@ RAYDoubleWarpedToComponents[model_Association,name_String,
   Return[rayFail["RAYDoubleWarpedToComponents: reference external g must be independent of internal coordinates and vice versa. Both warp fields are unrestricted."]]];
  coords=Join[externalCoordinates,internalCoordinates];
  A=model["WarpA"];B=model["WarpB"];
+ (* A bare symbolic parameter must never be mistaken for a constant warp:
+    the abstract API accepts bare scalar names, the component API requires
+    functions of coordinates or an explicit "ConstantA/B" assumption. *)
+ If[(Head[A]===Symbol&&!TrueQ[model["ConstantA"]])||
+    (Head[B]===Symbol&&!TrueQ[model["ConstantB"]]),
+   Return[rayFail["RAYDoubleWarpedToComponents: bare symbolic warp names have unknown coordinate dependence. Use A[t,x,y,z] and B[t,x,y,z], or explicitly set ConstantA/ConstantB -> True in the abstract model."]]];
  href=Join[rayDTReference[externalCoordinates,externalMetric,ass],
   <|"Coordinates"->externalCoordinates|>];
  tref=Join[rayDTReference[internalCoordinates,internalMetric,ass],
