@@ -259,3 +259,14 @@ Use RAYCrossWarpedGeometry[d,n,A,B,"DerivativeForm"->"Covariant"] for ds²=Exp[2
 Set "DerivativeForm"->"Partial" for partials PLUS the required Christoffel correction; RAYCrossToCovariant converts back exactly. Pure symbolic Hessians and Laplace-Beltrami operators have hat/tilde frame types and do not silently become ordinary derivatives. See PAPER_STYLE_WARPED_GUIDE.md and Examples/RAY_AppendixC_CrossWarped.wl. This metric class is different from the time-only RAYGeneralWarpedMetric.
 
 Latest downloadable standalone is https://github.com/shaikot996/RAY/releases/latest/download/RAYStandalone.wl. Use RAYUpdateStandalone[] in a running Mathematica kernel to download with release SHA256 checksum validation; restart kernel and Get[...] for the new version. No automatic remote code execution.
+
+## 15. Constant crossed warp factors (v1.3.1)
+
+RAYCrossWarpedGeometry now simplifies all formal differential operators
+acting on numeric constants exactly to zero. In particular A=1 means
+constant e^2 rescaling, not unit external warp; use A=0 for the latter.
+To declare a symbolic constant (e.g. c) without destroying its value,
+use "ConstantInternalWarp"->True or "ConstantExternalWarp"->True.
+Do not set these flags for dynamical fields. B[t] is an abstract
+external scalar with a time argument; hat covariant derivatives remain
+symbolic until the external reference metric is supplied.
