@@ -49,7 +49,7 @@ Inside Mathematica, run RAYUpdateStandalone[] to download the latest release to 
 
 - 35 new tests cover paper equations C.20-C.26, arbitrary symbolic dimensions, exact covariant/partial representation equivalence, mixed tensors, box rendering round-trip, and an independent 4D direct curvature computation with curved internal S², nontrivial external reference curvature and nonzero mixed Ricci.
 - The existing 278 test cases cover time-dependent symbolic d+n geometry, coordinate-dependent base warped products, Weyl rescaling, component geometry, numerical features, formatting and benchmarks.
-- The suite is 313 test cases across 8 test files. Test status will be confirmed on the final published standalone.
+- The suite is 313 test cases across 8 test files. All 313/313 tests passed in the Wolfram Language kernel against the v1.3.0 standalone candidate.
 
 ## Scope
 
