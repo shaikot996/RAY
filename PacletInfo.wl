@@ -1,6 +1,6 @@
 PacletObject[<|
   "Name" -> "RAY",
-  "Version" -> "1.3.0",
+  "Version" -> "1.3.1",
   "WolframVersion" -> "13.0+",
   "Description" -> "Relativity and Geometry Toolkit for symbolic d+n warped geometry, explicit tensors, matter actions and numerical relativity.",
   "Category" -> "Physics",

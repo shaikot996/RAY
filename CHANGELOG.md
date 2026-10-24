@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.3.1 — 2026-10-25
+
+- Fix constant-field derivatives in symbolic crossed-double-warp Ricci and Einstein tensors. All covariant/partial derivatives, Hessians, boxes, connection terms and gradient norms of numeric constants evaluate to zero.
+- Setting A=1 now correctly retains constant metric rescaling Exp[2], but produces no spurious derivative of 1; A=0 is the unit warp factor.
+- Add opt-in "ConstantInternalWarp" and "ConstantExternalWarp" for user-declared symbolic constant fields.
+- Preserve correct general B(t) abstract covariant derivatives unless the reference metric is known; no unjustified conversion to component derivatives.
+- Extend independent full 4D Ricci/Einstein checks and existing warped-product regressions.
+
+
+
 ## 1.3.0 — 2026-10-25
 
 - Add fully symbolic, arbitrary d+n crossed doubly warped curvature with A(y) and B(x), reproducing arXiv:2512.19793 Appendix C (C.20-C.26) in d=4, n=6.
