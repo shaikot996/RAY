@@ -55,6 +55,9 @@ RAYCovariantWarpedMetric (base-coordinate-dependent case).
 
 ## Testing
 
+Wolfram Language 15 verification: 33/33 new constant-warp checks plus all 313 pre-existing cases pass (**346/346** total).
+
+
 Adds independent 4D constant-warp tests and exact symbolic checks
 for all constant differential operators, including partial/covariant
 equivalence, scalar and full tensor identities. The v1.3.0 tests
