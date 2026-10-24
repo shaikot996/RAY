@@ -7,7 +7,8 @@
    Reference: universal conformal transformation of twisted products. *)
 
 Options[RAYDoubleWarpedGeometry]={"DerivativeForm"->"Covariant",
- "ConstantA"->False,"ConstantB"->False};
+ "ConstantA"->False,"ConstantB"->False,
+ "ExternalCoordinates"->Automatic,"InternalCoordinates"->Automatic};
 
 RAYFrameInner[_,a_?NumericQ,_]:=0;
 RAYFrameInner[_,_,a_?NumericQ]:=0;
@@ -51,7 +52,9 @@ RAYDoubleWarpedGeometry[d_,n_,A_,B_,OptionsPattern[]]:=Module[
  mu="μ",nu="ν",m="m",nn="n",h="Hat",tt="Tilde",
  gh,gt,rh,rt,scH,scT,ha,hb,ta,tb,pa1,pa2,pb1,pb2,
  qa1,qa2,qb1,qb2,naH,nbH,naT,nbT,abH,abT,
- xaH,xbH,xaT,xbT,coefH,coefT,RE,RI,RM,RS,GE,GI},
+ xaH,xbH,xaT,xbT,coefH,coefT,RE,RI,RM,RS,GE,GI,
+ xs=OptionValue["ExternalCoordinates"],ys=OptionValue["InternalCoordinates"],
+ registered,caH,caT,cbH,cbT},
  If[!MemberQ[{"Covariant","Partial"},form],
    Return[rayFail["RAYDoubleWarpedGeometry: DerivativeForm must be Covariant or Partial."]]];
  If[(NumericQ[d]&&(!IntegerQ[d]||d<1))||
@@ -59,26 +62,43 @@ RAYDoubleWarpedGeometry[d_,n_,A_,B_,OptionsPattern[]]:=Module[
    Return[rayFail["RAYDoubleWarpedGeometry: dimensions must be positive."]]];
  ca=TrueQ[OptionValue["ConstantA"]]||TrueQ[NumericQ[A]];
  cb=TrueQ[OptionValue["ConstantB"]]||TrueQ[NumericQ[B]];
+ registered=ListQ[xs]&&ListQ[ys]&&
+   AllTrue[Join[xs,ys],Head[#]===Symbol&]&&
+   Length[DeleteDuplicates[Join[xs,ys]]]==Length[Join[xs,ys]]&&
+   ( !IntegerQ[d]||Length[xs]==d )&&
+   ( !IntegerQ[n]||Length[ys]==n );
+ If[!(xs===Automatic&&ys===Automatic)&&!registered,
+  Return[rayFail["RAYDoubleWarpedGeometry: both complete disjoint ExternalCoordinates and InternalCoordinates lists are required to infer dependence, and sizes must agree with d,n."]]];
+ (* Bare symbolic tensor fields are never silently considered constant.
+    Only explicit coordinates can certify sector-wise independence. *)
+ caH=ca||(registered&&Head[A]=!=Symbol&&
+    AllTrue[xs,TrueQ[PossibleZeroQ[D[A,#]]]&]);
+ caT=ca||(registered&&Head[A]=!=Symbol&&
+    AllTrue[ys,TrueQ[PossibleZeroQ[D[A,#]]]&]);
+ cbH=cb||(registered&&Head[B]=!=Symbol&&
+    AllTrue[xs,TrueQ[PossibleZeroQ[D[B,#]]]&]);
+ cbT=cb||(registered&&Head[B]=!=Symbol&&
+    AllTrue[ys,TrueQ[PossibleZeroQ[D[B,#]]]&]);
  gh=RAYFrameTensor[h,"Metric",{mu,nu}];
  gt=RAYFrameTensor[tt,"Metric",{m,nn}];
  rh=RAYFrameTensor[h,"Ricci",{mu,nu}];
  rt=RAYFrameTensor[tt,"Ricci",{m,nn}];
  scH=RAYFrameScalar[h,"Ricci"];
  scT=RAYFrameScalar[tt,"Ricci"];
- ha=rayDTHess[h,mu,nu,A,ca,form];
- hb=rayDTHess[h,mu,nu,B,cb,form];
- ta=rayDTHess[tt,m,nn,A,ca,form];
- tb=rayDTHess[tt,m,nn,B,cb,form];
- pa1=rayDTPartial[h,mu,A,ca];pa2=rayDTPartial[h,nu,A,ca];
- pb1=rayDTPartial[h,mu,B,cb];pb2=rayDTPartial[h,nu,B,cb];
- qa1=rayDTPartial[tt,m,A,ca];qa2=rayDTPartial[tt,nn,A,ca];
- qb1=rayDTPartial[tt,m,B,cb];qb2=rayDTPartial[tt,nn,B,cb];
- naH=rayDTNorm[h,A,ca];nbH=rayDTNorm[h,B,cb];
- naT=rayDTNorm[tt,A,ca];nbT=rayDTNorm[tt,B,cb];
- abH=rayDTInner[h,A,B,ca,cb];
- abT=rayDTInner[tt,A,B,ca,cb];
- xaH=rayDTBox[h,A,ca,form];xbH=rayDTBox[h,B,cb,form];
- xaT=rayDTBox[tt,A,ca,form];xbT=rayDTBox[tt,B,cb,form];
+ ha=rayDTHess[h,mu,nu,A,caH,form];
+ hb=rayDTHess[h,mu,nu,B,cbH,form];
+ ta=rayDTHess[tt,m,nn,A,caT,form];
+ tb=rayDTHess[tt,m,nn,B,cbT,form];
+ pa1=rayDTPartial[h,mu,A,caH];pa2=rayDTPartial[h,nu,A,caH];
+ pb1=rayDTPartial[h,mu,B,cbH];pb2=rayDTPartial[h,nu,B,cbH];
+ qa1=rayDTPartial[tt,m,A,caT];qa2=rayDTPartial[tt,nn,A,caT];
+ qb1=rayDTPartial[tt,m,B,cbT];qb2=rayDTPartial[tt,nn,B,cbT];
+ naH=rayDTNorm[h,A,caH];nbH=rayDTNorm[h,B,cbH];
+ naT=rayDTNorm[tt,A,caT];nbT=rayDTNorm[tt,B,cbT];
+ abH=rayDTInner[h,A,B,caH,cbH];
+ abT=rayDTInner[tt,A,B,caT,cbT];
+ xaH=rayDTBox[h,A,caH,form];xbH=rayDTBox[h,B,cbH,form];
+ xaT=rayDTBox[tt,A,caT,form];xbT=rayDTBox[tt,B,cbT,form];
  coefH=xaH+(d-2)naH+n abH+
     Exp[2A-2B](xaT+d naT+(n-2)abT);
  coefT=xbT+(n-2)nbT+d abT+
@@ -87,8 +107,8 @@ RAYDoubleWarpedGeometry[d_,n_,A_,B_,OptionsPattern[]]:=Module[
     (d-2)pa1 pa2-n pb1 pb2+n(pa1 pb2+pb1 pa2)-gh coefH;
  RI=rt-(n-2)tb-d ta+
     (n-2)qb1 qb2-d qa1 qa2+d(qb1 qa2+qa1 qb2)-gt coefT;
- RM=-(d-1)rayDTMixed[mu,m,A,ca]-
-    (n-1)rayDTMixed[mu,m,B,cb]+
+ RM=-(d-1)rayDTMixed[mu,m,A,caH||caT]-
+    (n-1)rayDTMixed[mu,m,B,cbH||cbT]+
     (d+n-2)pb1 qa1;
  RS=Exp[-2A](scH-2(d-1)xaH-2n xbH-
      (d-1)(d-2)naH-n(n+1)nbH-2n(d-2)abH)+
@@ -103,6 +123,8 @@ RAYDoubleWarpedGeometry[d_,n_,A_,B_,OptionsPattern[]]:=Module[
   "DerivativeForm"->form,
   "CoordinateDependence"->"Unrestricted external and internal dependence for both scalar warp functions",
   "ConstantA"->ca,"ConstantB"->cb,
+  "ExternalCoordinates"->xs,"InternalCoordinates"->ys,
+  "CoordinatesRegistered"->registered,
   "Metric"->"Exp[2 A(x,y)] hat[g](x) + Exp[2 B(x,y)] tilde[g](y)",
   "RicciExternal"->RE,"RicciInternal"->RI,"RicciMixed"->RM,
   "RicciScalar"->RS,
