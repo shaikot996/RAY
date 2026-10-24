@@ -20,7 +20,10 @@ for module_path in sorted((root / "Kernel").glob("RAY*.wl")):
     assert source in bundle, f"Standalone missing module source: {module_path.name}"
 
 assert 'BeginPackage["RAY`"]' in bundle
-assert bundle.count('BeginPackage[') == bundle.count('EndPackage[') == 1
+# Match package declarations at the start of a source line, not text quoted
+# inside user-facing strings (the updater validates package markers in downloads).
+assert len(re.findall(r'(?m)^\s*BeginPackage\[', bundle)) == 1
+assert len(re.findall(r'(?m)^\s*EndPackage\[', bundle)) == 1
 assert "RAYSymbolicWarped.wl" not in bundle.split('(* --- Embedded', 1)[0], (
     "Standalone still depends on external symbolic warp source"
 )

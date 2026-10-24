@@ -10,7 +10,7 @@
 Under **Releases → Assets**, you can also download the versioned standalone ZIP and its SHA-256 checksums. The RAYStandalone.wl asset is the complete Wolfram Language package in one file; no installation/build compilation is needed.
 
 
-> **Version 1.2.1 — coordinate-covariant warped geometry.**  
+> **Version 1.3.0 — symbolic crossed warp and covariant output.**  
 > **RAY is under active development.** APIs, performance characteristics, and higher-level abstractions may evolve as the package grows.
 
 **RAY** is a Wolfram Language toolkit for explicit-component tensor geometry, general relativity, Raychaudhuri kinematics and dimension-independent curvature of time-warped product geometries.
@@ -19,6 +19,33 @@ Under **Releases → Assets**, you can also download the versioned standalone ZI
 
 RAY is designed around a simple workflow: define an explicit metric matrix and coordinates, optionally define a congruence $u^\mu$, and then query curvature, invariants, kinematics, mixed-index tensors, nonzero components, or a complete report using compact commands.
 
+
+## Appendix C-style crossed doubly warped geometry (v1.3.0)
+
+**New: exactly symbolic d+n Ricci/Einstein blocks in covariant or partial-plus-Christoffel form**, following the notation of arXiv:2512.19793 Appendix C (C.20–C.26). The metric class is Exp[2 A(y)] * hat[g](x) + Exp[2 B(x)] * tilde[g](y); unlike the previous time-only warped model, the two warp factors live on opposite coordinate factors.
+
+~~~mathematica
+ClearAll[d,n,A,B];
+geo=RAYCrossWarpedGeometry[d,n,A,B,
+ "DerivativeForm"->"Covariant"];
+geo["RicciExternal"] // RAYPretty
+geo["RicciInternal"] // RAYPretty
+geo["RicciMixed"] // RAYPretty
+geo["RicciScalar"] // RAYPretty
+geo["EinsteinExternal"] // RAYPretty
+RAYCrossWarpedReport[geo]
+
+partial=RAYCrossWarpedGeometry[d,n,A,B,
+ "DerivativeForm"->"Partial"];
+Expand[RAYCrossToCovariant[partial["RicciExternal"]]-
+ geo["RicciExternal"]]     (* 0 *)
+~~~
+
+[Complete paper-style guide](PAPER_STYLE_WARPED_GUIDE.md) · [Worked notebook code](Examples/RAY_AppendixC_CrossWarped.wl).
+
+**Keep standalone updated:** GitHub Releases automatically builds the new downloadable standalone on every version. From Mathematica run RAYUpdateStandalone[] to retrieve the latest standalone with SHA256 verification and a backup, then restart the kernel.
+
+---
 
 ## Coordinate-covariant warped geometry (v1.2.1)
 

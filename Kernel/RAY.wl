@@ -244,9 +244,23 @@ RAYCovariantBox::usage = "RAYCovariantBox[f] formally represents the base metric
 RAYGradientNorm::usage = "RAYGradientNorm[f] formally represents (nabla f)^2 = g^ab partial_a f partial_b f.";
 
 
+RAYCrossWarpedGeometry::usage = "RAYCrossWarpedGeometry[d,n,A,B,opts] returns Appendix-C-style external/internal/mixed Ricci and Einstein tensors for crossed double warp Exp[2A(y)] hatg(x) + Exp[2B(x)] tildeg(y), with symbolic d,n and DerivativeForm Covariant or Partial.";
+RAYCrossToCovariant::usage = "RAYCrossToCovariant[expr] converts the exact partial-plus-connection symbolic representation back to covariant operators.";
+RAYCrossWarpedReport::usage = "RAYCrossWarpedReport[model] shows paper-style symbolic Ricci tensor, Ricci scalar and Einstein tensor blocks.";
+RAYFrameTensor::usage = "RAYFrameTensor[Hat|Tilde,type,indices] is an inert indexed reference metric or curvature tensor with geometric accent.";
+RAYFrameScalar::usage = "RAYFrameScalar[Hat|Tilde,Ricci] is an inert intrinsic curvature scalar with frame accent.";
+RAYFramePartial::usage = "RAYFramePartial[frame,index,phi] formally denotes a coordinate partial derivative.";
+RAYFrameHessian::usage = "RAYFrameHessian[frame,index1,index2,phi] denotes the scalar covariant Hessian for the frame reference metric.";
+RAYFramePartialHessian::usage = "RAYFramePartialHessian[frame,index1,index2,phi] is a formal second coordinate partial derivative.";
+RAYFrameConnectionTerm::usage = "RAYFrameConnectionTerm[frame,index1,index2,phi] is Gamma^k_ij partial_k phi, the needed correction in the covariant Hessian.";
+RAYFrameBox::usage = "RAYFrameBox[frame,phi] denotes the Laplace-Beltrami operator of the frame.";
+RAYFramePartialBox::usage = "RAYFramePartialBox[frame,phi] displays the Laplace-Beltrami operator as a partial-plus-connection contraction.";
+RAYFrameNorm::usage = "RAYFrameNorm[frame,phi] denotes g^ij partial_i phi partial_j phi on the frame.";
+RAYUpdateStandalone::usage = "RAYUpdateStandalone[] downloads the latest release to Downloads, verifies SHA256 and makes a backup; user restarts kernel before loading.";
+
 Begin["`Private`"];
 
-$RAYVersion = "1.2.1";
+$RAYVersion = "1.3.0";
 RAYVersion := $RAYVersion;
 
 $rayMetrics = <||>;
@@ -1462,6 +1476,8 @@ Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYFormatting.wl"}]];
 Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYHandwritten.wl"}]];
 Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYSymbolicWarped.wl"}]];
 Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYCovariantWarped.wl"}]];
+Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYCrossWarped.wl"}]];
+Get[FileNameJoin[{DirectoryName[$InputFileName],"RAYDownloads.wl"}]];
 
 $rayHelpRows=Join[$rayHelpRows,{
   {"RAYRaw[RAYRicci[dd]]","Raw form of a complete RAY geometry call."},
