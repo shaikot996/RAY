@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.3.0 — 2026-10-25
+
+- Add fully symbolic, arbitrary d+n crossed doubly warped curvature with A(y) and B(x), reproducing arXiv:2512.19793 Appendix C (C.20-C.26) in d=4, n=6.
+- New user-selectable Covariant or Partial derivative form. The partial form explicitly retains connection terms and inverse-metric contractions.
+- Add visible hat and tilde metric, Ricci, Einstein, Laplace-Beltrami and covariant Hessian notation with copy/paste-preserving interpretation boxes.
+- Provide all Ricci and Einstein external, internal and mixed tensors, plus Ricci scalar, without requiring component dimensions.
+- Add RAYUpdateStandalone[] to download the latest SHA256-verified GitHub Release standalone with a local backup, never executing fetched code.
+- Confirm all 35 new formula, math-type and independent 4D curved double warp tests in Wolfram kernel; previous regression and benchmarks retained.
+
+
+
 ## 1.2.1 — 2026-10-15
 
 - Prevent the time-only symbolic warp API from silently discarding x-dependence, including A[t,x], A[t] Sin[x] and x-dependent lapse factors. Constant symbolic coefficients must be declared through the "Parameters" option.
