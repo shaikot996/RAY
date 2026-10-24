@@ -250,3 +250,12 @@ RAYCovariantWarpedMetric[name,baseCoordinates,baseMetric,n,B] computes the actua
 RAYWeylRescale[d,omega] returns the standard arbitrary-dimensional conformal Ricci tensor/scalar expressions with formal base metric covariant derivatives. RAYPartialD and RAYNabla retain distinct semantics. RAYReadable defaults to fractional partial derivatives; use "DerivativeNotation"->"Dot" for optional time dots. RAW remains Mathematica input syntax.
 
 See Examples/RAY_CovariantWarped_Example.wl and Tests/RAY_CovariantWarped_Tests.wl.
+
+
+## 14. Paper-style crossed double-warp identities and updating (v1.3.0)
+
+Use RAYCrossWarpedGeometry[d,n,A,B,"DerivativeForm"->"Covariant"] for ds²=Exp[2A(y)] hatg(x)+Exp[2B(x)] tildeg(y). Dimensions remain symbolic; both reference Ricci tensors remain general. Keys: RicciExternal, RicciInternal, RicciMixed, RicciScalar, EinsteinExternal, EinsteinInternal, EinsteinMixed.
+
+Set "DerivativeForm"->"Partial" for partials PLUS the required Christoffel correction; RAYCrossToCovariant converts back exactly. Pure symbolic Hessians and Laplace-Beltrami operators have hat/tilde frame types and do not silently become ordinary derivatives. See PAPER_STYLE_WARPED_GUIDE.md and Examples/RAY_AppendixC_CrossWarped.wl. This metric class is different from the time-only RAYGeneralWarpedMetric.
+
+Latest downloadable standalone is https://github.com/shaikot996/RAY/releases/latest/download/RAYStandalone.wl. Use RAYUpdateStandalone[] in a running Mathematica kernel to download with release SHA256 checksum validation; restart kernel and Get[...] for the new version. No automatic remote code execution.
