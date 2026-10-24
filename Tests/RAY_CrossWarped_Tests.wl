@@ -153,6 +153,41 @@ AppendTo[crossTests,VerificationTest[
  {"Destination"->Automatic,"VerifySHA256"->True},
  TestID->"31-updater-options-default-secure"]];
 
+
+paperExpectedGH=RAYFrameTensor["Hat","Einstein",{"μ","ν"}]-
+ 6(RAYFrameHessian["Hat","μ","ν",B]+
+ RAYFramePartial["Hat","μ",B]RAYFramePartial["Hat","ν",B])+
+ 3hG(2RAYFrameBox["Hat",B]+7RAYFrameNorm["Hat",B])+
+ 3hG Exp[2A-2B](RAYFrameBox["Tilde",A]+
+   2RAYFrameNorm["Tilde",A])-
+ 1/2 hG Exp[2A-2B] RAYFrameScalar["Tilde","Ricci"];
+paperExpectedGT=RAYFrameTensor["Tilde","Einstein",{"m","n"}]-
+ 4(RAYFrameHessian["Tilde","m","n",A]+
+ RAYFramePartial["Tilde","m",A]RAYFramePartial["Tilde","n",A])+
+ 2tG(2RAYFrameBox["Tilde",A]+5RAYFrameNorm["Tilde",A])+
+ 5tG Exp[2B-2A](RAYFrameBox["Hat",B]+
+   3RAYFrameNorm["Hat",B])-
+ 1/2 tG Exp[2B-2A] RAYFrameScalar["Hat","Ricci"];
+paperExpectedScalar=Exp[-2A] RAYFrameScalar["Hat","Ricci"]+
+ Exp[-2B]RAYFrameScalar["Tilde","Ricci"]-
+ 6Exp[-2A](2RAYFrameBox["Hat",B]+7RAYFrameNorm["Hat",B])-
+ 4Exp[-2B](2RAYFrameBox["Tilde",A]+5RAYFrameNorm["Tilde",A]);
+AppendTo[crossTests,VerificationTest[
+ Expand[paper["EinsteinExternal"]-paperExpectedGH],0,
+ TestID->"32-paper-C20-external-Einstein"]];
+AppendTo[crossTests,VerificationTest[
+ Expand[paper["EinsteinInternal"]-paperExpectedGT],0,
+ TestID->"33-paper-C21-internal-Einstein"]];
+AppendTo[crossTests,VerificationTest[
+ Expand[paper["RicciScalar"]-paperExpectedScalar],0,
+ TestID->"34-paper-C26-Ricci-scalar"]];
+AppendTo[crossTests,VerificationTest[
+ RAYCrossToCovariant[
+  RAYCrossWarpedGeometry[4,6,A,B,
+   "DerivativeForm"->"Partial"]["RicciMixed"]]-
+  paper["RicciMixed"],0,
+ TestID->"35-paper-C25-partial-mixed"]];
+
 crossReport=TestReport[crossTests];
 crossSummary=<|"Total"->Length[crossTests],
  "Passed"->Length[crossReport[[1]]["TestsSucceededKeys"]],
