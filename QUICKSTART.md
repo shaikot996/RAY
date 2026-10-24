@@ -49,3 +49,13 @@ g=RAYGeneralWarpedMetric[d,n,A[t],B[t],
 g["TotalDimension"]
 g["RicciScalar"]//RAYReadable
 ~~~
+
+## Arbitrary doubly twisted d+n metric
+
+~~~mathematica
+ClearAll[d,n,A,B];
+geo=RAYDoubleWarpedGeometry[d,n,A,B];
+RAYDoubleWarpedReport[geo]
+~~~
+
+For both warps varying in all external and internal coordinates, see GENERAL_DOUBLE_WARP.md. The reference metrics need not be diagonal, Kähler, Einstein, or constant curvature.
