@@ -1,2 +1,2 @@
-(* RAY direct-load compatibility loader. *)
-Get[FileNameJoin[{DirectoryName[$InputFileName], "Kernel", "RAY.wl"}]];
+(* RAY repository compatibility entrypoint; self-contained source is RAY.wl. *)
+Get[FileNameJoin[{DirectoryName[$InputFileName], "RAY.wl"}]];

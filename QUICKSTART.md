@@ -1,55 +1,51 @@
-# RAY standalone — Quick start
+# RAY: one-file installation
 
-The **RAYStandalone.wl** file is the complete RAY Mathematica/Wolfram Language package bundled into one file. It is a source-based Wolfram package, not a Windows executable. You do not need the rest of the repository for this installation method.
+Download: https://github.com/shaikot996/RAY/releases/latest/download/RAY.wl
 
-## Download
+RAY.wl is the complete Wolfram Language package. No compilation or additional modules required.
 
-Open https://github.com/shaikot996/RAY/releases/latest and under **Assets** download:
+## Load directly
 
-- **RAYStandalone.wl** — one file, ready to load in Mathematica
-- **RAY-vX.Y.Z-standalone.zip** — the same file with this guide and version-specific release notes
-- **SHA256SUMS.txt** — checksums for validating downloaded assets
-
-## Run on Windows
-
-1. Save the standalone file in your Downloads folder.
-2. Start Mathematica, and restart the kernel if an older RAY version was loaded.
-3. Evaluate this input cell, changing YourUser to your Windows username:
+Save RAY.wl to Downloads:
 
 ~~~mathematica
-Get["C:\\Users\\YourUser\\Downloads\\RAYStandalone.wl"];
-
+Get[FileNameJoin[{$HomeDirectory,"Downloads","RAY.wl"}]];
 RAYVersion
 RAYHelp[]
 ~~~
 
-## Linux and macOS
+## Install for Needs (Windows, Linux, macOS)
 
 ~~~mathematica
-Get[FileNameJoin[{$HomeDirectory, "Downloads", "RAYStandalone.wl"}]];
+src=FileNameJoin[{$HomeDirectory,"Downloads","RAY.wl"}];
+dir=FileNameJoin[{$UserBaseDirectory,"Applications"}];
+If[!DirectoryQ[dir],CreateDirectory[dir,CreateIntermediateDirectories->True]];
+CopyFile[src,FileNameJoin[{dir,"RAY.wl"}],OverwriteTarget->True];
+~~~
 
+Restart kernel and run:
+
+~~~mathematica
+Needs["RAY`"];
 RAYVersion
 ~~~
 
-## First symbolic d+n test
+Future updates:
+
+~~~mathematica
+RAYUpdate[]
+~~~
+
+RAYUpdateStandalone[] remains an older command name for the same verified updater.
+Existing installations are backed up to RAY.wl.previous.
+If the older updater reports a SHA256 mismatch, install the RAY.wl release file manually once using the first two sections.
+
+## Test general d+n geometry
 
 ~~~mathematica
 ClearAll[d,n,t,A,B];
-
-model=RAYGeneralWarpedMetric[d,n,A[t],B[t],
-  "Time"->t, "InternalGeometry"->"General"];
-
-model["TotalDimension"]          (* d+n *)
-model["RicciScalar"] // RAYReadable
-model["RicciTimeTime"] // RAYReadable
+g=RAYGeneralWarpedMetric[d,n,A[t],B[t],
+ "Time"->t,"InternalGeometry"->"General"];
+g["TotalDimension"]
+g["RicciScalar"]//RAYReadable
 ~~~
-
-## For package developers
-
-Use the complete repository with the Kernel directory and PacletInfo.wl if you want to edit individual RAY modules, run the test suites, or use Needs["RAY`"]. Loading the standalone file via Get does not require paclet installation.
-
-Official package home: https://github.com/shaikot996/RAY
-
-Historical releases are pinned to a tag. The stable *latest* download URL always points at the newest published release:
-
-https://github.com/shaikot996/RAY/releases/latest/download/RAYStandalone.wl

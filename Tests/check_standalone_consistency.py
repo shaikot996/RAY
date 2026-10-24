@@ -5,7 +5,10 @@ import re
 
 root = Path(__file__).resolve().parent.parent
 core = (root / "Kernel" / "RAY.wl").read_text(encoding="utf-8")
-bundle = (root / "RAYStandalone.wl").read_text(encoding="utf-8")
+bundle = (root / "RAY.wl").read_text(encoding="utf-8")
+legacy = (root / "RAYStandalone.wl").read_text(encoding="utf-8")
+assert bundle == legacy, "Legacy standalone diverged from RAY.wl"
+assert len(bundle)>20000 and bundle.startswith("(* RAY standalone"), "RAY.wl must be self-contained"
 
 version = re.search(r'\$RAYVersion\s*=\s*"([^"]+)"', core)
 paclet = (root / "PacletInfo.wl").read_text(encoding="utf-8")

@@ -1,4 +1,4 @@
-(* RAY standalone v1.3.1 — exact constant-field derivatives in crossed warped products. *)
+(* RAY standalone v1.3.2 — exact constant-field derivatives in crossed warped products. *)
 
 (* ::Package:: *)
 
@@ -258,11 +258,12 @@ RAYFrameConnectionTerm::usage = "RAYFrameConnectionTerm[frame,index1,index2,phi]
 RAYFrameBox::usage = "RAYFrameBox[frame,phi] denotes the Laplace-Beltrami operator of the frame.";
 RAYFramePartialBox::usage = "RAYFramePartialBox[frame,phi] displays the Laplace-Beltrami operator as a partial-plus-connection contraction.";
 RAYFrameNorm::usage = "RAYFrameNorm[frame,phi] denotes g^ij partial_i phi partial_j phi on the frame.";
-RAYUpdateStandalone::usage = "RAYUpdateStandalone[] downloads the latest release to Downloads, verifies SHA256 and makes a backup; user restarts kernel before loading.";
+RAYUpdate::usage = "RAYUpdate[] installs the latest self-contained RAY.wl with SHA256 verification."; 
+RAYUpdateStandalone::usage = "RAYUpdateStandalone[] is a compatibility alias for RAYUpdate[].";
 
 Begin["`Private`"];
 
-$RAYVersion = "1.3.1";
+$RAYVersion = "1.3.2";
 RAYVersion := $RAYVersion;
 
 $rayMetrics = <||>;
@@ -3555,60 +3556,77 @@ $rayHelpRows=Join[$rayHelpRows,{
 
 (* --- Embedded Kernel/RAYDownloads.wl --- *)
 (* ::Package:: *)
-(* Opt-in latest standalone downloader. It NEVER evaluates downloaded code.
-   GitHub Actions publishes a permanent latest/download/RAYStandalone.wl URL. *)
+(* Verified RAY.wl updater; FileHash uses raw file bytes. *)
 Options[RAYUpdateStandalone]={"Destination"->Automatic,"VerifySHA256"->True};
-
-RAYUpdateStandalone[OptionsPattern[]] := Module[
- {dest=OptionValue["Destination"],validate=OptionValue["VerifySHA256"],
+Options[RAYUpdate]=Options[RAYUpdateStandalone];
+RAYUpdate[opts:OptionsPattern[]]:=RAYUpdateStandalone[
+ "Destination"->OptionValue["Destination"],
+ "VerifySHA256"->OptionValue["VerifySHA256"]];
+RAYUpdateStandalone[OptionsPattern[]]:=Module[
+ {dest=OptionValue["Destination"],verify=OptionValue["VerifySHA256"],
   uri="https://github.com/shaikot996/RAY/releases/latest/download/",
-  sourceTemp,shaTemp,dl,shaDl,checks,expected,actual,txt,result,back,ok=False},
+  sourceTemp,shaTemp,dl,shaDl,checks,entries,matched,
+  expected,actual,txt,result,back="",ok=False},
  If[dest===Automatic,
-   dest=FileNameJoin[{$HomeDirectory,"Downloads","RAYStandalone.wl"}]];
+   dest=FileNameJoin[{$UserBaseDirectory,"Applications","RAY.wl"}]];
  If[!StringQ[dest]||StringLength[dest]===0,
-  Return[rayFail["RAYUpdateStandalone: Destination must be a file path."]]];
+  Return[rayFail["RAYUpdate: invalid destination."]]];
  If[!DirectoryQ[DirectoryName[dest]],
-  Return[rayFail["RAYUpdateStandalone: destination folder does not exist."]]];
+  If[Quiet@Check[CreateDirectory[DirectoryName[dest],
+    CreateIntermediateDirectories->True];True,$Failed]=!=True,
+   Return[rayFail["RAYUpdate: cannot create destination directory."]]]];
  sourceTemp=CreateTemporary[];shaTemp=CreateTemporary[];
  result=Catch[
-  dl=Quiet@Check[URLDownload[uri<>"RAYStandalone.wl",sourceTemp],$Failed];
+  dl=Quiet@Check[URLDownload[uri<>"RAY.wl",sourceTemp],$Failed];
   If[dl===$Failed||!FileExistsQ[sourceTemp]||FileByteCount[sourceTemp]<20000,
-   Throw[rayFail["RAYUpdateStandalone: unable to download standalone WL file."]]];
+    Throw[rayFail["RAYUpdate: unable to download RAY.wl."]]];
   txt=Quiet@Check[Import[sourceTemp,"Text"],$Failed];
-  If[txt===$Failed||!StringContainsQ[txt,"BeginPackage[\"RAY`\"]"]||
-     !StringContainsQ[txt,"EndPackage[]"]||
-     !StringContainsQ[txt,"$RAYVersion"],
-   Throw[rayFail["RAYUpdateStandalone: invalid RAY distribution."]]];
-  If[TrueQ[validate],
+  If[txt===$Failed||!StringContainsQ[txt,"BeginPackage["]||
+    !StringContainsQ[txt,"EndPackage[]"]||
+    !StringContainsQ[txt,"$RAYVersion"],
+    Throw[rayFail["RAYUpdate: invalid downloaded package."]]];
+  If[TrueQ[verify],
    shaDl=Quiet@Check[URLDownload[uri<>"SHA256SUMS.txt",shaTemp],$Failed];
    If[shaDl===$Failed||!FileExistsQ[shaTemp],
-    Throw[rayFail["RAYUpdateStandalone: SHA256 checksum unavailable."]]];
+     Throw[rayFail["RAYUpdate: checksum file unavailable."]]];
    checks=Quiet@Check[Import[shaTemp,"Text"],$Failed];
-   expected=If[StringQ[checks],
-     StringCases[checks,RegularExpression[
-      "(?m)^([0-9a-fA-F]{64})[ \\t]+RAYStandalone\\.wl[ \\t]*$"]->"$1"],{}];
-   If[expected==={},
-    Throw[rayFail["RAYUpdateStandalone: standalone checksum not found."]]];
-   actual=ToLowerCase[Hash[BinaryReadList[sourceTemp,"Byte"],"SHA256","HexString"]];
-   If[ToLowerCase[First[expected]]=!=actual,
-    Throw[rayFail["RAYUpdateStandalone: SHA256 mismatch. Existing file preserved."]]]
+   If[!StringQ[checks],
+     Throw[rayFail["RAYUpdate: cannot read checksums."]]];
+   entries=StringSplit[StringTrim[#]]& /@ StringSplit[checks,"\n"];
+   matched=Select[entries,Length[#]>=2&&Last[#]==="RAY.wl"&];
+   If[Length[matched]=!=1||
+      !StringMatchQ[First[matched[[1]]],
+       RegularExpression["[A-Fa-f0-9]{64}"]],
+     Throw[rayFail["RAYUpdate: missing or ambiguous RAY.wl checksum."]]];
+   expected=ToLowerCase[First[matched[[1]]]];
+   actual=ToLowerCase[FileHash[sourceTemp,"SHA256","HexString"]];
+   If[!StringQ[actual]||actual=!=expected,
+     Throw[rayFail["RAYUpdate: SHA256 mismatch. Existing file preserved."]]];
   ];
   If[FileExistsQ[dest],
-    back=dest<>".previous";
-    If[FileExistsQ[back],DeleteFile[back]];
-    CopyFile[dest,back]];
-  CopyFile[sourceTemp,dest,OverwriteTarget->True];
+   back=dest<>".previous";
+   If[FileExistsQ[back],DeleteFile[back]];
+   If[Quiet@Check[CopyFile[dest,back];True,$Failed]=!=True,
+     Throw[rayFail["RAYUpdate: backup failed."]]]];
+  If[Quiet@Check[CopyFile[sourceTemp,dest,OverwriteTarget->True];True,$Failed]=!=True,
+     Throw[rayFail["RAYUpdate: installation failed."]]];
+  If[TrueQ[verify]&&
+     ToLowerCase[FileHash[dest,"SHA256","HexString"]]=!=expected,
+    If[back=!=""&&FileExistsQ[back],
+      CopyFile[back,dest,OverwriteTarget->True],
+      If[FileExistsQ[dest],DeleteFile[dest]]];
+    Throw[rayFail["RAYUpdate: installed checksum mismatch; original restored."]]];
   ok=True;dest
  ];
  If[FileExistsQ[sourceTemp],DeleteFile[sourceTemp]];
  If[FileExistsQ[shaTemp],DeleteFile[shaTemp]];
- If[ok,Print["RAY downloaded and verified: ",dest,
- ". Restart the Mathematica kernel and load this file to activate."]];
+ If[ok,Print["RAY.wl verified and installed: ",dest,
+   ". Restart kernel and run Needs[\"RAY"<>FromCharacterCode[96]<>"\"]."]];
  result
 ];
-
 $rayHelpRows=Join[$rayHelpRows,{
- {"RAYUpdateStandalone[]","Download and verify the latest RAYStandalone.wl release, keeping a .previous backup; never evaluates remote code."}
+ {"RAYUpdate[]","Verify SHA256 and install the latest RAY.wl, backing up the previous version."},
+ {"RAYUpdateStandalone[]","Compatibility alias of RAYUpdate[]; the installed file is RAY.wl."}
 }];
 
 End[];

@@ -256,11 +256,12 @@ RAYFrameConnectionTerm::usage = "RAYFrameConnectionTerm[frame,index1,index2,phi]
 RAYFrameBox::usage = "RAYFrameBox[frame,phi] denotes the Laplace-Beltrami operator of the frame.";
 RAYFramePartialBox::usage = "RAYFramePartialBox[frame,phi] displays the Laplace-Beltrami operator as a partial-plus-connection contraction.";
 RAYFrameNorm::usage = "RAYFrameNorm[frame,phi] denotes g^ij partial_i phi partial_j phi on the frame.";
-RAYUpdateStandalone::usage = "RAYUpdateStandalone[] downloads the latest release to Downloads, verifies SHA256 and makes a backup; user restarts kernel before loading.";
+RAYUpdate::usage = "RAYUpdate[] installs the latest self-contained RAY.wl with SHA256 verification."; 
+RAYUpdateStandalone::usage = "RAYUpdateStandalone[] is a compatibility alias for RAYUpdate[].";
 
 Begin["`Private`"];
 
-$RAYVersion = "1.3.1";
+$RAYVersion = "1.3.2";
 RAYVersion := $RAYVersion;
 
 $rayMetrics = <||>;
