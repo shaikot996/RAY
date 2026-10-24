@@ -6,7 +6,21 @@
    The Riemann sign follows the core RAY convention. *)
 
 Options[RAYCrossWarpedGeometry]={"DerivativeForm"->"Covariant",
-  "Simplification"->"Simplify"};
+  "Simplification"->"Simplify",
+  "ConstantInternalWarp"->False,
+  "ConstantExternalWarp"->False};
+
+(* These objects are formal differential operators. Numerically constant
+   scalars have identically zero first/second derivatives, Hessian,
+   Laplace–Beltrami operator, connection corrections, and gradient norm.
+   Do NOT infer that an arbitrary symbolic field is constant. *)
+RAYFramePartial[_,_,v_?NumericQ] := 0;
+RAYFrameHessian[_,_,_,v_?NumericQ] := 0;
+RAYFramePartialHessian[_,_,_,v_?NumericQ] := 0;
+RAYFrameConnectionTerm[_,_,_,v_?NumericQ] := 0;
+RAYFrameBox[_,v_?NumericQ] := 0;
+RAYFramePartialBox[_,v_?NumericQ] := 0;
+RAYFrameNorm[_,v_?NumericQ] := 0;
 
 RAYCrossWarpedGeometry[d_,n_,internalWarp_,externalWarp_,
   OptionsPattern[]] := Module[
@@ -14,10 +28,12 @@ RAYCrossWarpedGeometry[d_,n_,internalWarp_,externalWarp_,
   hmu="μ",hnu="ν",tm="m",tn="n",RH,RT,gh,gt,
   boxH,boxT,normH,normT,hessH,hessT,gradH1,gradH2,gradT1,gradT2,
   ricH,ricT,ricMix,ricScalar,einH,einT,einMix,
-  hSquare,tSquare,formHess},
+  constantA,constantB},
  If[!MemberQ[{"Covariant","Partial"},form],
    Return[rayFail[
     "RAYCrossWarpedGeometry: \"DerivativeForm\" must be \"Covariant\" or \"Partial\"."]]];
+ constantA=TrueQ[OptionValue["ConstantInternalWarp"]]||TrueQ[NumericQ[aa]];
+ constantB=TrueQ[OptionValue["ConstantExternalWarp"]]||TrueQ[NumericQ[bb]];
  If[NumericQ[d]&&(!IntegerQ[d]||d<1)||
     NumericQ[n]&&(!IntegerQ[n]||n<1),
    Return[rayFail["RAYCrossWarpedGeometry: d and n must be positive dimensions."]]];
@@ -25,24 +41,24 @@ RAYCrossWarpedGeometry[d_,n_,internalWarp_,externalWarp_,
  RT=RAYFrameTensor["Tilde","Ricci",{tm,tn}];
  gh=RAYFrameTensor["Hat","Metric",{hmu,hnu}];
  gt=RAYFrameTensor["Tilde","Metric",{tm,tn}];
- boxH=If[form==="Covariant",
-   RAYFrameBox["Hat",bb],RAYFramePartialBox["Hat",bb]];
- boxT=If[form==="Covariant",
-   RAYFrameBox["Tilde",aa],RAYFramePartialBox["Tilde",aa]];
- normH=RAYFrameNorm["Hat",bb];
- normT=RAYFrameNorm["Tilde",aa];
- hessH=If[form==="Covariant",
+ boxH=If[constantB,0,If[form==="Covariant",
+   RAYFrameBox["Hat",bb],RAYFramePartialBox["Hat",bb]]];
+ boxT=If[constantA,0,If[form==="Covariant",
+   RAYFrameBox["Tilde",aa],RAYFramePartialBox["Tilde",aa]]];
+ normH=If[constantB,0,RAYFrameNorm["Hat",bb]];
+ normT=If[constantA,0,RAYFrameNorm["Tilde",aa]];
+ hessH=If[constantB,0,If[form==="Covariant",
    RAYFrameHessian["Hat",hmu,hnu,bb],
    RAYFramePartialHessian["Hat",hmu,hnu,bb]-
-   RAYFrameConnectionTerm["Hat",hmu,hnu,bb]];
- hessT=If[form==="Covariant",
+   RAYFrameConnectionTerm["Hat",hmu,hnu,bb]]];
+ hessT=If[constantA,0,If[form==="Covariant",
    RAYFrameHessian["Tilde",tm,tn,aa],
    RAYFramePartialHessian["Tilde",tm,tn,aa]-
-   RAYFrameConnectionTerm["Tilde",tm,tn,aa]];
- gradH1=RAYFramePartial["Hat",hmu,bb];
- gradH2=RAYFramePartial["Hat",hnu,bb];
- gradT1=RAYFramePartial["Tilde",tm,aa];
- gradT2=RAYFramePartial["Tilde",tn,aa];
+   RAYFrameConnectionTerm["Tilde",tm,tn,aa]]];
+ gradH1=If[constantB,0,RAYFramePartial["Hat",hmu,bb]];
+ gradH2=If[constantB,0,RAYFramePartial["Hat",hnu,bb]];
+ gradT1=If[constantA,0,RAYFramePartial["Tilde",tm,aa]];
+ gradT2=If[constantA,0,RAYFramePartial["Tilde",tn,aa]];
  ricH=RH-n (hessH+gradH1 gradH2)-
     gh Exp[2 aa-2 bb](boxT+d normT);
  ricT=RT-d (hessT+gradT1 gradT2)-
@@ -68,6 +84,8 @@ RAYCrossWarpedGeometry[d_,n_,internalWarp_,externalWarp_,
    "ExternalWarp"->aa,"InternalWarp"->bb,
    "Metric"->"Exp[2 A(y)] hat[g](x) + Exp[2 B(x)] tilde[g](y)",
    "DerivativeForm"->form,
+   "InternalWarpConstant"->constantA,
+   "ExternalWarpConstant"->constantB,
    "RicciExternal"->ricH,"RicciInternal"->ricT,
    "RicciMixed"->ricMix,"RicciScalar"->ricScalar,
    "EinsteinExternal"->einH,"EinsteinInternal"->einT,
