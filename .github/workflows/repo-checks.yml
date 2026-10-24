@@ -36,6 +36,7 @@ jobs:
           test -f Kernel/RAYDownloads.wl
           test -f Tests/RAY_CrossWarped_Tests.wl
           test -f Tests/RAY_CrossWarp_Constant_Tests.wl
+          test -f Tests/RAY_Update_Tests.wl
           test -f RELEASE_NOTES_v1.3.2.md
           test -f PAPER_STYLE_WARPED_GUIDE.md
           test -f Examples/RAY_AppendixC_CrossWarped.wl
