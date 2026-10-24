@@ -8,7 +8,9 @@ names={"RicciExternal","RicciInternal","RicciMixed","RicciScalar",
 mix=-(d-1)RAYMixedPartial["μ","m",A]-
  (n-1)RAYMixedPartial["μ","m",B]+
  (d+n-2)RAYFramePartial["Hat","μ",B]RAYFramePartial["Tilde","m",A];
-normal=RAYDoubleWarpedGeometry[4,6,1,B[t,x]];
+normal=RAYDoubleWarpedGeometry[4,6,1,B[t,x],
+ "ExternalCoordinates"->{t,x,h1,h2},
+ "InternalCoordinates"->{y,z,i1,i2,i3,i4}];
 other=RAYDoubleWarpedGeometry[4,6,A[t,x,y,z],0];
 zero=RAYDoubleWarpedGeometry[d,n,0,0];
 legacy=RAYCrossWarpedGeometry[4,6,A,B,"WarpDependence"->"Separated"];
