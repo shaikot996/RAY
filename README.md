@@ -10,7 +10,7 @@
 Under **Releases → Assets**, you can also download the versioned standalone ZIP and its SHA-256 checksums. The RAYStandalone.wl asset is the complete Wolfram Language package in one file; no installation/build compilation is needed.
 
 
-> **Version 1.3.0 — symbolic crossed warp and covariant output.**  
+> **Version 1.3.1 — exact constant-warp simplification.**  
 > **RAY is under active development.** APIs, performance characteristics, and higher-level abstractions may evolve as the package grows.
 
 **RAY** is a Wolfram Language toolkit for explicit-component tensor geometry, general relativity, Raychaudhuri kinematics and dimension-independent curvature of time-warped product geometries.
@@ -19,6 +19,40 @@ Under **Releases → Assets**, you can also download the versioned standalone ZI
 
 RAY is designed around a simple workflow: define an explicit metric matrix and coordinates, optionally define a congruence $u^\mu$, and then query curvature, invariants, kinematics, mixed-index tensors, nonzero components, or a complete report using compact commands.
 
+
+## Constant warp factors now simplify correctly (v1.3.1)
+
+If the first crossed warp factor is constant, its covariant Hessian, partial
+derivatives, Laplace–Beltrami operator, and gradient norms are mathematically
+zero. This is now automatic for numeric constants, including A=0 and A=1.
+
+~~~mathematica
+ClearAll[d,n,t,B,c];
+
+g=RAYCrossWarpedGeometry[4,6,1,B[t]];
+g["RicciExternal"] // RAYPretty
+g["RicciInternal"] // RAYPretty
+g["RicciMixed"] // RAYPretty           (* 0 *)
+g["RicciScalar"] // RAYPretty
+
+(* Unit external warp factor is A=0, since Exp[2A]=1. *)
+unit=RAYCrossWarpedGeometry[4,6,0,B[t]];
+
+(* User-declared constant symbolic warp amplitude c *)
+symbolic=RAYCrossWarpedGeometry[d,n,c,B[t],
+ "ConstantInternalWarp"->True];
+~~~
+
+A constant external warp is separately supported by
+"ConstantExternalWarp"->True. These are explicit user assumptions for
+symbolic fields; they should not be used for coordinate-dependent functions.
+
+A symbolic B[t] indicates a field with a specified time argument, but the
+reference external metric must also be specified before its abstract covariant
+Hessian can be resolved into coordinate components. See the [paper-style
+guide](PAPER_STYLE_WARPED_GUIDE.md) and [v1.3.1 release notes](RELEASE_NOTES_v1.3.1.md).
+
+---
 
 ## Appendix C-style crossed doubly warped geometry (v1.3.0)
 
