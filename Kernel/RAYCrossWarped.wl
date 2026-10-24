@@ -11,7 +11,7 @@ Options[RAYCrossWarpedGeometry]={"DerivativeForm"->"Covariant",
 RAYCrossWarpedGeometry[d_,n_,internalWarp_,externalWarp_,
   OptionsPattern[]] := Module[
  {form=OptionValue["DerivativeForm"],aa=internalWarp,bb=externalWarp,
-  hmu="mu",hnu="nu",tm="m",tn="n",RH,RT,gh,gt,
+  hmu="μ",hnu="ν",tm="m",tn="n",RH,RT,gh,gt,
   boxH,boxT,normH,normT,hessH,hessT,gradH1,gradH2,gradT1,gradT2,
   ricH,ricT,ricMix,ricScalar,einH,einT,einMix,
   hSquare,tSquare,formHess},
@@ -116,8 +116,7 @@ RAYFrameScalar /: MakeBoxes[
 
 rayCrossOperator[frame_,"Nabla"] :=
  OverscriptBox["\[Del]",rayCrossAccent[frame]];
-rayCrossOperator[frame_,"Partial"] :=
- OverscriptBox["\[PartialD]",rayCrossAccent[frame]];
+rayCrossOperator[frame_,"Partial"] := "\[PartialD]";
 rayCrossOperator[frame_,"Box"] :=
  OverscriptBox["\[EmptySquare]",rayCrossAccent[frame]];
 
@@ -150,7 +149,7 @@ RAYFramePartialHessian /: MakeBoxes[RAYFramePartialHessian[
 RAYFrameConnectionTerm /: MakeBoxes[RAYFrameConnectionTerm[
  frame_String,i_,j_,expr_],fmt:(StandardForm|TraditionalForm)] :=
  With[{boxes=RowBox[{
-  SubsuperscriptBox[rayCrossOperator[frame,"Partial"]/.OverscriptBox["\[PartialD]",accent_] :> OverscriptBox["\[CapitalGamma]",accent],
+  SubsuperscriptBox[OverscriptBox["\[CapitalGamma]",rayCrossAccent[frame]],
     RowBox[{i,j}],"\[Rho]"],
   SubscriptBox[rayCrossOperator[frame,"Partial"],"\[Rho]"],
   MakeBoxes[expr,fmt]}]},
