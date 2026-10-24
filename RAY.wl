@@ -3877,6 +3877,10 @@ RAYDoubleWarpedToComponents[model_Association,name_String,
  If[!TrueQ[FullSimplify[model["ExternalDimension"]==d&&
       model["InternalDimension"]==n,ass]],
   Return[rayFail["RAYDoubleWarpedToComponents: reference coordinate sizes must match specified dimensions."]]];
+ If[TrueQ[model["CoordinatesRegistered"]]&&
+    (model["ExternalCoordinates"]=!=externalCoordinates||
+     model["InternalCoordinates"]=!=internalCoordinates),
+  Return[rayFail["RAYDoubleWarpedToComponents: supplied coordinate lists differ from those registered in the abstract model."]]];
  If[Dimensions[externalMetric]=!={d,d}||Dimensions[internalMetric]=!={n,n}||
     Length[DeleteDuplicates[Join[externalCoordinates,internalCoordinates]]]=!=d+n,
   Return[rayFail["RAYDoubleWarpedToComponents: inconsistent coordinate or matrix dimensions."]]];
