@@ -127,7 +127,7 @@ AppendTo[constantChecks,VerificationTest[
   Assumptions->0<y<Pi],
  ConstantArray[0,{4,4}],TestID->"c32-full-4D-Einstein-independent"]];
 AppendTo[constantChecks,VerificationTest[
- FullSimplify[directS-(expectedScalar/.c->1),Assumptions->0<y<Pi]/.c->1],
+ FullSimplify[(directS-expectedScalar)/.c->1,Assumptions->0<y<Pi],
  0,TestID->"c33-constant-A1-substitution-consistency"]];
 
 constantReport=TestReport[constantChecks];
