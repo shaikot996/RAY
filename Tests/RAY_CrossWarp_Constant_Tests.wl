@@ -20,7 +20,7 @@ fullConst=RAYCrossWarpedGeometry[4,6,1,2,
  "DerivativeForm"->"Partial"];
 
 constantChecks={
- VerificationTest[RAYVersion,"1.3.2",TestID->"c01-version"],
+ VerificationTest[RAYVersion,"1.4.0",TestID->"c01-version"],
  VerificationTest[a1["InternalWarpConstant"],True,
   TestID->"c02-numeric-constant-detection"],
  VerificationTest[a1["ExternalWarpConstant"],False,
