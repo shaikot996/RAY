@@ -193,7 +193,7 @@ RAYGeneralBlockToComponents[model_Association,name_String,
  If[!TrueQ[FullSimplify[Transpose[hat]==hat,ass]]||
     !TrueQ[FullSimplify[Transpose[tilde]==tilde,ass]],
   Return[rayFail["RAYGeneralBlockToComponents: both reference metrics must be symmetric."]]];
- If[!TrueQ[FullSimplify[Det[hat]!=0&&Det[tilde]!=0,ass]],
+ If[TrueQ[FullSimplify[Det[hat]==0||Det[tilde]==0,ass]],
   Return[rayFail["RAYGeneralBlockToComponents: reference metrics must be nondegenerate under supplied assumptions."]]];
  H=Exp[2a]hat;Q=Exp[2b]tilde;
  block=rayGBBlockCurvature[xs,ys,H,Q,ass];
