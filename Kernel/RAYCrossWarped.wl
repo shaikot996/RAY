@@ -8,7 +8,8 @@
 Options[RAYCrossWarpedGeometry]={"DerivativeForm"->"Covariant",
   "Simplification"->"Simplify",
   "ConstantInternalWarp"->False,
-  "ConstantExternalWarp"->False};
+  "ConstantExternalWarp"->False,
+  "WarpDependence"->"Separated"};
 
 (* These objects are formal differential operators. Numerically constant
    scalars have identically zero first/second derivatives, Hessian,
@@ -29,6 +30,13 @@ RAYCrossWarpedGeometry[d_,n_,internalWarp_,externalWarp_,
   boxH,boxT,normH,normT,hessH,hessT,gradH1,gradH2,gradT1,gradT2,
   ricH,ricT,ricMix,ricScalar,einH,einT,einMix,
   constantA,constantB},
+ If[OptionValue["WarpDependence"]==="General",
+  Return[RAYDoubleWarpedGeometry[d,n,internalWarp,externalWarp,
+    "DerivativeForm"->form,
+    "ConstantA"->OptionValue["ConstantInternalWarp"],
+    "ConstantB"->OptionValue["ConstantExternalWarp"]]]];
+ If[OptionValue["WarpDependence"]=!="Separated",
+  Return[rayFail["RAYCrossWarpedGeometry: WarpDependence must be General or Separated."]]];
  If[!MemberQ[{"Covariant","Partial"},form],
    Return[rayFail[
     "RAYCrossWarpedGeometry: \"DerivativeForm\" must be \"Covariant\" or \"Partial\"."]]];

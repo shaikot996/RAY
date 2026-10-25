@@ -244,6 +244,12 @@ RAYCovariantBox::usage = "RAYCovariantBox[f] formally represents the base metric
 RAYGradientNorm::usage = "RAYGradientNorm[f] formally represents (nabla f)^2 = g^ab partial_a f partial_b f.";
 
 
+RAYDoubleWarpedGeometry::usage = "RAYDoubleWarpedGeometry[d,n,A,B] derives fully general d+n doubly twisted Ricci and Einstein tensor blocks for A(x,y),B(x,y), with arbitrary reference metrics.";
+RAYDoubleWarpedReport::usage = "RAYDoubleWarpedReport[model] displays fully general abstract crossed warp curvature identities.";
+RAYDoubleWarpedToComponents::usage = "RAYDoubleWarpedToComponents[model,name,externalCoordinates,internalCoordinates,externalMetric,internalMetric] builds and verifies concrete tensor components.";
+RAYFrameInner::usage = "RAYFrameInner[frame,A,B] denotes reference-metric contraction of gradients of two scalar fields.";
+RAYMixedPartial::usage = "RAYMixedPartial[mu,m,A] denotes the mixed second coordinate derivative of a warp scalar.";
+
 RAYCrossWarpedGeometry::usage = "RAYCrossWarpedGeometry[d,n,A,B,opts] returns Appendix-C-style external/internal/mixed Ricci and Einstein tensors for crossed double warp Exp[2A(y)] hatg(x) + Exp[2B(x)] tildeg(y), with symbolic d,n and DerivativeForm Covariant or Partial.";
 RAYCrossToCovariant::usage = "RAYCrossToCovariant[expr] converts the exact partial-plus-connection symbolic representation back to covariant operators.";
 RAYCrossWarpedReport::usage = "RAYCrossWarpedReport[model] shows paper-style symbolic Ricci tensor, Ricci scalar and Einstein tensor blocks.";
@@ -261,7 +267,7 @@ RAYUpdateStandalone::usage = "RAYUpdateStandalone[] is a compatibility alias for
 
 Begin["`Private`"];
 
-$RAYVersion = "1.3.2";
+$RAYVersion = "1.4.0";
 RAYVersion := $RAYVersion;
 
 $rayMetrics = <||>;

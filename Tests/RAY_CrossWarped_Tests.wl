@@ -6,7 +6,7 @@ par=RAYCrossWarpedGeometry[d,n,A,B,"DerivativeForm"->"Partial"];
 crossKeys={"RicciExternal","RicciInternal","RicciMixed","RicciScalar",
  "EinsteinExternal","EinsteinInternal","EinsteinMixed"};
 crossTests={
- VerificationTest[RAYVersion,"1.3.2",TestID->"01-version"],
+ VerificationTest[RAYVersion,"1.4.0",TestID->"01-version"],
  VerificationTest[cov["TotalDimension"],d+n,TestID->"02-symbolic-d+n"],
  VerificationTest[Length[crossKeys],7,TestID->"03-seven-geometric-sectors"],
  VerificationTest[AllTrue[crossKeys,KeyExistsQ[cov,#]&],True,

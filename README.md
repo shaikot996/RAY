@@ -13,8 +13,8 @@
 Under **Releases → Assets**, you can also download the versioned standalone ZIP and its SHA-256 checksums. The RAY.wl asset is the complete Wolfram Language package in one file; no installation/build compilation is needed.
 
 
-> **Version 1.3.2 — corrected raw-byte SHA256 updater and canonical RAY.wl.**  
-> [Install / repair in one file](QUICKSTART.md) · [v1.3.2 release notes](RELEASE_NOTES_v1.3.2.md)  
+> **Version 1.4.0 — fully independent d+n doubly twisted geometry, arbitrary A(x,y), B(x,y).**  
+> [Install / repair in one file](QUICKSTART.md) · [v1.4.0 release notes](RELEASE_NOTES_v1.4.0.md)  
 > **RAY is under active development.** APIs, performance characteristics, and higher-level abstractions may evolve as the package grows.
 
 **RAY** is a Wolfram Language toolkit for explicit-component tensor geometry, general relativity, Raychaudhuri kinematics and dimension-independent curvature of time-warped product geometries.
@@ -784,6 +784,22 @@ The current suite covers representative checks including Bianchi-I, Schwarzschil
 
 ---
 
+
+## Fully general coordinate-independent double warp
+
+RAY 1.4.0 includes RAYDoubleWarpedGeometry[d,n,A,B] for arbitrary smooth A(x,y) and B(x,y). Neither warp is silently restricted to external-only or internal-only coordinates. Returns the full symbolic d+n Ricci tensor external/internal/mixed sectors, Ricci scalar, and Einstein tensors. Use RAYDoubleWarpedToComponents to supply reference coordinate lists and matrices, compute exact tensor components and verify the general analytic identities against an independent Levi-Civita calculation.
+
+**[Full formulas, conventions, and Mathematica examples](GENERAL_DOUBLE_WARP.md)**
+
+~~~mathematica
+ClearAll[d,n,A,B];
+model = RAYDoubleWarpedGeometry[d,n,A,B];
+RAYDoubleWarpedReport[model]
+model["RicciMixed"] // RAYPretty
+~~~
+
+The legacy RAYCrossWarpedGeometry retains its separable semantics; set "WarpDependence"->"General" for the unrestricted formula.
+
 ## Repository structure
 
 ```text
@@ -836,7 +852,7 @@ RAY is released under the **MIT License**. See [`LICENSE`](LICENSE).
 
 ## Project status
 
-**Version:** 1.2.0  
+**Version:** 1.4.0  
 **Status:** under active development  
 **Language:** Wolfram Language  
 **Primary focus:** explicit-component tensor geometry, general relativity, and Raychaudhuri kinematics

@@ -1,10 +1,10 @@
-(* RAY v1.3.2 updater SHA256 regression tests. *)
+(* RAY v1.4.0 updater SHA256 regression tests. *)
 Needs["RAY`"];
 hashFile=CreateTemporary[];
 BinaryWrite[hashFile,ToCharacterCode["abc","UTF-8"],"Byte"];
 Close[hashFile];
 updateTests={
- VerificationTest[RAYVersion,"1.3.2",TestID->"01-version"],
+ VerificationTest[RAYVersion,"1.4.0",TestID->"01-version"],
  VerificationTest[Head[RAYUpdate],Symbol,TestID->"02-update-command"],
  VerificationTest[Head[RAYUpdateStandalone],Symbol,TestID->"03-legacy-command"],
  VerificationTest[Options[RAYUpdate],

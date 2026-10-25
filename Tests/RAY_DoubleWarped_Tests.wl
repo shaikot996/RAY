@@ -1,0 +1,102 @@
+(* 45 tests: general d+n and independently checked explicit 2+2. *)
+Needs["RAY"<>FromCharacterCode[96]];
+ClearAll[d,n,A,B,c,t,x,y,z];
+g=RAYDoubleWarpedGeometry[d,n,A,B];
+p=RAYDoubleWarpedGeometry[d,n,A,B,"DerivativeForm"->"Partial"];
+names={"RicciExternal","RicciInternal","RicciMixed","RicciScalar",
+ "EinsteinExternal","EinsteinInternal","EinsteinMixed"};
+mix=-(d-1)RAYMixedPartial["μ","m",A]-
+ (n-1)RAYMixedPartial["μ","m",B]+
+ (d+n-2)RAYFramePartial["Hat","μ",B]RAYFramePartial["Tilde","m",A];
+normal=RAYDoubleWarpedGeometry[4,6,1,B[t,x],
+ "ExternalCoordinates"->{t,x,h1,h2},
+ "InternalCoordinates"->{y,z,i1,i2,i3,i4}];
+other=RAYDoubleWarpedGeometry[4,6,A[t,x,y,z],0];
+zero=RAYDoubleWarpedGeometry[d,n,0,0];
+legacy=RAYCrossWarpedGeometry[4,6,A,B,"WarpDependence"->"Separated"];
+generalViaLegacy=RAYCrossWarpedGeometry[d,n,A,B,"WarpDependence"->"General"];
+checks={
+ VerificationTest[RAYVersion,"1.4.0",TestID->"01-version"],
+ VerificationTest[g["Type"],"GeneralDoubleWarpedGeometry",TestID->"02-type"],
+ VerificationTest[g["TotalDimension"],d+n,TestID->"03-symbolic-dim"],
+ VerificationTest[AllTrue[names,KeyExistsQ[g,#]&],True,TestID->"04-seven-sectors"],
+ VerificationTest[Expand[g["RicciMixed"]-mix],0,TestID->"05-mixed-formula"],
+ VerificationTest[g["RicciMixed"]===g["EinsteinMixed"],True,TestID->"06-mixed-Einstein"],
+ VerificationTest[!FreeQ[g["RicciExternal"],RAYFrameHessian["Hat","μ","ν",A]],True,TestID->"07-external-A-hessian"],
+ VerificationTest[!FreeQ[g["RicciExternal"],RAYFrameHessian["Hat","μ","ν",B]],True,TestID->"08-external-B-hessian"],
+ VerificationTest[!FreeQ[g["RicciInternal"],RAYFrameHessian["Tilde","m","n",A]],True,TestID->"09-internal-A-hessian"],
+ VerificationTest[!FreeQ[g["RicciInternal"],RAYFrameHessian["Tilde","m","n",B]],True,TestID->"10-internal-B-hessian"],
+ VerificationTest[!FreeQ[g["RicciScalar"],RAYFrameInner["Hat",A,B]],True,TestID->"11-external-cross-gradient"],
+ VerificationTest[!FreeQ[g["RicciScalar"],RAYFrameInner["Tilde",A,B]],True,TestID->"12-internal-cross-gradient"],
+ VerificationTest[AllTrue[names,Expand[RAYCrossToCovariant[p[#]]-g[#]]===0&],True,TestID->"13-partial-covariant-equal"],
+ VerificationTest[Head[RAYDoubleWarpedReport[g]],Column,TestID->"14-report"],
+ VerificationTest[generalViaLegacy["Type"],"GeneralDoubleWarpedGeometry",TestID->"15-legacy-general-option"],
+ VerificationTest[legacy["Type"],"CrossWarpedGeometry",TestID->"16-legacy-separated"],
+ VerificationTest[Quiet[RAYCrossWarpedGeometry[2,2,A,B,"WarpDependence"->"Wrong"]],$Failed,TestID->"17-invalid-legacy-mode"],
+ VerificationTest[Quiet[RAYDoubleWarpedGeometry[0,2,A,B]],$Failed,TestID->"18-invalid-d"],
+ VerificationTest[Quiet[RAYDoubleWarpedGeometry[2,0,A,B]],$Failed,TestID->"19-invalid-n"],
+ VerificationTest[Quiet[RAYDoubleWarpedGeometry[2,2,A,B,"DerivativeForm"->"Other"]],$Failed,TestID->"20-invalid-form"],
+ VerificationTest[normal["RicciMixed"],0,TestID->"21-only-external-B-mixed-zero"],
+ VerificationTest[other["RicciMixed"],-3RAYMixedPartial["μ","m",A[t,x,y,z]],TestID->"22-varying-A-mixed-nonzero"],
+ VerificationTest[zero["RicciMixed"],0,TestID->"23-constant-warp-mixed-zero"],
+ VerificationTest[Expand[zero["RicciScalar"]-RAYFrameScalar["Hat","Ricci"]-RAYFrameScalar["Tilde","Ricci"]],0,TestID->"24-direct-product-scalar"],
+ VerificationTest[RAYDoubleWarpedGeometry[3,2,c,B,"ConstantA"->True]["RicciMixed"],
+   -RAYMixedPartial["μ","m",B],TestID->"25-symbolically-constant-A"],
+ VerificationTest[RAYDoubleWarpedGeometry[3,2,A,c,"ConstantB"->True]["RicciMixed"],
+   -2RAYMixedPartial["μ","m",A],TestID->"26-symbolically-constant-B"],
+ VerificationTest[!FreeQ[g["RicciMixed"],RAYMixedPartial["μ","m",A]],True,TestID->"27-mixed-A-preserved"],
+ VerificationTest[!FreeQ[g["RicciMixed"],RAYMixedPartial["μ","m",B]],True,TestID->"28-mixed-B-preserved"],
+ VerificationTest[RAYFrameInner["Hat",A,A],RAYFrameNorm["Hat",A],TestID->"29-inner-norm"],
+ VerificationTest[RAYFrameInner["Hat",1,B],0,TestID->"30-constant-inner-zero"],
+ VerificationTest[ToExpression[ToBoxes[RAYMixedPartial["μ","m",A],StandardForm],StandardForm],
+   RAYMixedPartial["μ","m",A],TestID->"31-mixed-pretty-roundtrip"],
+ VerificationTest[ToExpression[ToBoxes[RAYFrameInner["Hat",A,B],StandardForm],StandardForm],
+   RAYFrameInner["Hat",A,B],TestID->"32-inner-pretty-roundtrip"],
+ VerificationTest[StringContainsQ[g["CoordinateDependence"],"Unrestricted"],True,TestID->"33-general-metadata"]
+};
+r=TestReport[checks];
+sumA=<|"Total"->Length[checks],
+ "Passed"->Length[r[[1]]["TestsSucceededKeys"]],
+ "Failed"->Length[r[[1]]["TestsFailedWrongResultsKeys"]]+Length[r[[1]]["TestsFailedWithMessagesKeys"]]|>;
+
+ClearAll[t,x,y,z,A,B];
+m=RAYDoubleWarpedGeometry[2,2,A[t,x,y,z],B[t,x,y,z]];
+first=RAYDoubleWarpedToComponents[m,"General2plus2",{t,x},{y,z},
+ DiagonalMatrix[{-1,1}],IdentityMatrix[2],
+ "Verify"->True,"Simplification"->"Simplify"];
+second=RAYDoubleWarpedToComponents[
+ RAYDoubleWarpedGeometry[2,2,t*y+x*z,t*z+x*y],
+ "Curved2plus2",{t,x},{y,z},
+ DiagonalMatrix[{-1,1+t^2}],DiagonalMatrix[{1,1+y^2}],
+ "Verify"->True,"Simplification"->"Simplify"];
+rejectedBare=Quiet[RAYDoubleWarpedToComponents[
+ RAYDoubleWarpedGeometry[2,2,A,B],"RejectBare",
+ {t,x},{y,z},DiagonalMatrix[{-1,1}],IdentityMatrix[2]]];
+rejectedRef=Quiet[RAYDoubleWarpedToComponents[
+ m,"RejectReference",{t,x},{y,z},
+ DiagonalMatrix[{-1,1+y^2}],IdentityMatrix[2]]];
+fullChecks={
+ VerificationTest[first["Verified"],True,TestID->"34-full-field-functions-verify"],
+ VerificationTest[second["Verified"],True,TestID->"35-curved-references-verify"],
+ VerificationTest[AllTrue[Flatten[Values[first["Residuals"]]],PossibleZeroQ],True,TestID->"36-full-all-sectors-zero"],
+ VerificationTest[AllTrue[Flatten[Values[second["Residuals"]]],PossibleZeroQ],True,TestID->"37-curved-all-sectors-zero"],
+ VerificationTest[Dimensions[first["Metric"]],{4,4},TestID->"38-metric-dim"],
+ VerificationTest[Dimensions[second["RicciExternal"]],{2,2},TestID->"39-external-dim"],
+ VerificationTest[Dimensions[second["RicciInternal"]],{2,2},TestID->"40-internal-dim"],
+ VerificationTest[Dimensions[second["RicciMixed"]],{2,2},TestID->"41-mixed-dim"],
+ VerificationTest[rejectedBare,$Failed,TestID->"42-no-silent-symbol-assumptions"],
+ VerificationTest[rejectedRef,$Failed,TestID->"43-no-cross-reference-dependence"],
+ VerificationTest[PossibleZeroQ[first["RicciMixed"][[1,1]]+
+   Derivative[1,0,1,0][A][t,x,y,z]+
+   Derivative[1,0,1,0][B][t,x,y,z]-
+   2Derivative[0,0,1,0][A][t,x,y,z]Derivative[1,0,0,0][B][t,x,y,z]],
+   True,TestID->"44-direct-mixed-derivative"],
+ VerificationTest[PossibleZeroQ[second["RicciScalar"]-
+   second["DerivedFromGeneralFormula"]["RicciScalar"]],
+   True,TestID->"45-independent-curved-scalar"]
+};
+rs=TestReport[fullChecks];
+sumB=<|"Total"->Length[fullChecks],
+ "Passed"->Length[rs[[1]]["TestsSucceededKeys"]],
+ "Failed"->Length[rs[[1]]["TestsFailedWrongResultsKeys"]]+Length[rs[[1]]["TestsFailedWithMessagesKeys"]]|>;
+{sumA,sumB}
