@@ -7,7 +7,10 @@
    Abstract curvature identities are exact C/K decompositions.
    Riemann convention matches the component RAY engine. *)
 
-Options[RAYGeneralBlockGeometry]={"DerivativeForm"->"Covariant"};
+Options[RAYGeneralBlockGeometry]={"DerivativeForm"->"Covariant",
+ "ConstantA"->False,"ConstantB"->False,
+ "ExternalReferenceMetric"->"hat[g](x,y)",
+ "InternalReferenceMetric"->"tilde[g](x,y)"};
 RAYGeneralBlockGeometry[d_,n_,A_,B_,OptionsPattern[]]:=Module[
  {mu="\[Mu]",nu="\[Nu]",m="m",nn="n",form=OptionValue["DerivativeForm"],
   H,Q,ricH,ricQ,ricM,scalar,einH,einQ},
@@ -45,11 +48,17 @@ RAYGeneralBlockGeometry[d_,n_,A_,B_,OptionsPattern[]]:=Module[
  <|"Type"->"GeneralOrthogonalBlocks",
   "TotalDimension"->d+n,"ExternalDimension"->d,"InternalDimension"->n,
   "WarpA"->A,"WarpB"->B,"DerivativeForm"->form,
+  "ConstantA"->TrueQ[OptionValue["ConstantA"]]||NumericQ[A],
+  "ConstantB"->TrueQ[OptionValue["ConstantB"]]||NumericQ[B],
+  "ExternalReferenceMetric"->OptionValue["ExternalReferenceMetric"],
+  "InternalReferenceMetric"->OptionValue["InternalReferenceMetric"],
   "ExternalMetric"->H,"InternalMetric"->Q,
   "Metric"->"H=Exp[2A(x,y)] hat[g](x,y), Q=Exp[2B(x,y)] tilde[g](x,y)",
   "ReferenceMetricDependence"->"Both reference blocks may depend on all external and internal coordinates",
   "CDefinition"->RAYBlockTerm["CDefinition",{}],
+  "CExpanded"->RAYBlockTerm["CExpanded",{}],
   "KDefinition"->RAYBlockTerm["KDefinition",{}],
+  "KExpanded"->RAYBlockTerm["KExpanded",{}],
   "RicciExternal"->ricH,"RicciInternal"->ricQ,
   "RicciMixed"->ricM,"RicciScalar"->scalar,
   "EinsteinExternal"->einH,"EinsteinInternal"->einQ,
@@ -69,7 +78,9 @@ RAYBlockTerm /: MakeBoxes[RAYBlockTerm[type_String,indices_List],
     "QDivKUp","Div[Q] K","PartialKTrace","d Tr(K)",
     "KTraceC","Tr(K) C","CTraceK","Tr(C) K",
     "CKCross","C.K","CDefinition","C = (1/2) d_y H",
-    "KDefinition","K = (1/2) d_x Q",_,type],FontSlant->"Italic"],
+    "KDefinition","K = (1/2) d_x Q",
+    "CExpanded","C = exp(2A) [d_y A hatg + (1/2) d_y hatg]",
+    "KExpanded","K = exp(2B) [d_x B tildeg + (1/2) d_x tildeg]",_,type],FontSlant->"Italic"],
    RowBox[If[StringQ[#],# ,MakeBoxes[#,fmt]]&/@indices]]},
  InterpretationBox[b,RAYBlockTerm[type,indices],Editable->False]
 ];
@@ -85,6 +96,8 @@ RAYGeneralBlockReport[g_Association]/;
  Grid[{{"Metric",g["Metric"]},
  {"C = (1/2) partial_m H",g["CDefinition"]},
  {"K = (1/2) partial_mu Q",g["KDefinition"]},
+ {"K expanded (includes partial_mu tilde g)",g["KExpanded"]},
+ {"C expanded (includes partial_m hat g)",g["CExpanded"]},
  {"External Ricci",RAYPretty[g["RicciExternal"]]},
  {"Internal Ricci",RAYPretty[g["RicciInternal"]]},
  {"Mixed Ricci",RAYPretty[g["RicciMixed"]]},
@@ -190,6 +203,9 @@ RAYGeneralBlockToComponents[model_Association,name_String,
     Dimensions[hat]=!={d,d}||Dimensions[tilde]=!={n,n}||
     Length[DeleteDuplicates[all]]=!=Length[all],
   Return[rayFail["RAYGeneralBlockToComponents: coordinate and matrix dimensions must match concrete d,n."]]];
+ If[(Head[a]===Symbol&&!TrueQ[model["ConstantA"]])||
+    (Head[b]===Symbol&&!TrueQ[model["ConstantB"]]),
+  Return[rayFail["RAYGeneralBlockToComponents: unknown coordinate dependence for bare symbolic warp names. Use A[t,x,y,...], B[t,x,y,...] or declare ConstantA/ConstantB -> True."]]];
  If[!TrueQ[FullSimplify[Transpose[hat]==hat,ass]]||
     !TrueQ[FullSimplify[Transpose[tilde]==tilde,ass]],
   Return[rayFail["RAYGeneralBlockToComponents: both reference metrics must be symmetric."]]];
