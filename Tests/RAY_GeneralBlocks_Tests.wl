@@ -1,0 +1,112 @@
+(* RAY 1.5.0: general x,y-dependent internal metric and full block
+   Levi-Civita comparison, including all Einstein tensor blocks. *)
+Needs["RAY`"];
+ClearAll[d,n,a,b,t,x,y,z,A,B];
+g=RAYGeneralBlockGeometry[d,n,A,B];
+formal={
+ VerificationTest[RAYVersion,"1.5.0",TestID->"01-version"],
+ VerificationTest[g["Type"],"GeneralOrthogonalBlocks",TestID->"02-type"],
+ VerificationTest[g["TotalDimension"],d+n,TestID->"03-d+n"],
+ VerificationTest[g["DerivativeForm"],"Covariant",TestID->"04-covariant"],
+ VerificationTest[g["CDefinition"],RAYBlockTerm["CDefinition",{}],TestID->"05-C-defined"],
+ VerificationTest[g["KDefinition"],RAYBlockTerm["KDefinition",{}],TestID->"06-K-defined"],
+ VerificationTest[g["KExpanded"],RAYBlockTerm["KExpanded",{}],TestID->"07-K-contains-metric-derivative"],
+ VerificationTest[g["CExpanded"],RAYBlockTerm["CExpanded",{}],TestID->"08-C-contains-metric-derivative"],
+ VerificationTest[StringContainsQ[g["ReferenceMetricDependence"],"all external"],True,TestID->"09-all-dependence"],
+ VerificationTest[AllTrue[{"RicciExternal","RicciInternal","RicciMixed","RicciScalar",
+   "EinsteinExternal","EinsteinInternal","EinsteinMixed"},KeyExistsQ[g,#]&],True,
+   TestID->"10-seven-curvature-blocks"],
+ VerificationTest[g["EinsteinMixed"]===g["RicciMixed"],True,TestID->"11-mixed-Einstein"],
+ VerificationTest[g["EinsteinExternal"],
+   g["RicciExternal"]-g["ExternalMetric"]g["RicciScalar"]/2,
+   TestID->"12-external-Einstein-definition"],
+ VerificationTest[g["EinsteinInternal"],
+   g["RicciInternal"]-g["InternalMetric"]g["RicciScalar"]/2,
+   TestID->"13-internal-Einstein-definition"],
+ VerificationTest[g["RicciScalar"],
+   RAYBlockTrace["H",g["RicciExternal"]]+
+   RAYBlockTrace["Q",g["RicciInternal"]],
+   TestID->"14-scalar-by-contraction"],
+ VerificationTest[Head[RAYGeneralBlockReport[g]],Column,TestID->"15-report"],
+ VerificationTest[Quiet[RAYGeneralBlockGeometry[0,2,A,B]],$Failed,TestID->"16-bad-d"],
+ VerificationTest[Quiet[RAYGeneralBlockGeometry[2,0,A,B]],$Failed,TestID->"17-bad-n"],
+ VerificationTest[Quiet[RAYGeneralBlockGeometry[2,2,A,B,"DerivativeForm"->"Partial"]],$Failed,
+   TestID->"18-no-misleading-partial-mode"],
+ VerificationTest[ToExpression[ToBoxes[RAYBlockTerm["KDefinition",{}],StandardForm],StandardForm],
+   RAYBlockTerm["KDefinition",{}],TestID->"19-box-roundtrip"],
+ VerificationTest[ToExpression[ToBoxes[RAYBlockTrace["H",g["RicciExternal"]],StandardForm],
+   StandardForm],RAYBlockTrace["H",g["RicciExternal"]],TestID->"20-trace-roundtrip"]
+};
+formalReport=TestReport[formal];
+formalSummary=<|"Total"->Length[formal],
+ "Passed"->Length[formalReport[[1]]["TestsSucceededKeys"]],
+ "Failed"->Length[formalReport[[1]]["TestsFailedWrongResultsKeys"]]+
+ Length[formalReport[[1]]["TestsFailedWithMessagesKeys"]]|>;
+
+ClearAll[t,y,x,z,A,B];
+v11=RAYGeneralBlockToComponents[
+ RAYGeneralBlockGeometry[1,1,A[t,y],B[t,y]],
+ "GeneralInternal11",{t},{y},{{-1}},{{1+t^2+y^2}},
+ "Verify"->True];
+v21=RAYGeneralBlockToComponents[
+ RAYGeneralBlockGeometry[2,1,t*y,x*y],
+ "GeneralInternal21",{t,x},{y},
+ DiagonalMatrix[{-1,1+y^2}],{{1+t^2+y^2}},
+ "Verify"->True,"Simplification"->"Simplify"];
+v22=RAYGeneralBlockToComponents[
+ RAYGeneralBlockGeometry[2,2,0,0],
+ "GeneralInternal22",{t,x},{y,z},
+ DiagonalMatrix[{-1,1+y^2}],
+ DiagonalMatrix[{1+t^2,1+t*y}],
+ "Verify"->True,"Simplification"->"Simplify"];
+badBare=Quiet[RAYGeneralBlockToComponents[
+ RAYGeneralBlockGeometry[1,1,A,B],"RejectBare",
+ {t},{y},{{-1}},{{1+t^2}}]];
+badShapes=Quiet[RAYGeneralBlockToComponents[
+ RAYGeneralBlockGeometry[2,1,0,0],"RejectShape",
+ {t,x},{y},{{-1}},{{1+t^2}}]];
+badAsym=Quiet[RAYGeneralBlockToComponents[
+ RAYGeneralBlockGeometry[2,1,0,0],"RejectAsym",
+ {t,x},{y},{{-1,t},{0,1}},{{1+t^2}}]];
+special=RAYDoubleWarpedGeometry[1,1,A[t,y],B[t,y]];
+old=RAYDoubleWarpedToComponents[special,"OldReference11",
+ {t},{y},{{-1}},{{1}},"Verify"->True];
+new=RAYGeneralBlockToComponents[
+ RAYGeneralBlockGeometry[1,1,A[t,y],B[t,y]],
+ "NewReference11",{t},{y},{{-1}},{{1}},"Verify"->True];
+full={
+ VerificationTest[v11["Verified"],True,TestID->"21-1+1-dynamic-tilde"],
+ VerificationTest[v21["Verified"],True,TestID->"22-2+1-both-metrics-vary"],
+ VerificationTest[v22["Verified"],True,TestID->"23-2+2-metric-t-y"],
+ VerificationTest[AllTrue[Flatten[Values[v21["Residuals"]]],PossibleZeroQ],
+   True,TestID->"24-2+1-all-tensor-components"],
+ VerificationTest[AllTrue[Flatten[Values[v22["Residuals"]]],PossibleZeroQ],
+   True,TestID->"25-2+2-all-tensor-components"],
+ VerificationTest[Dimensions[v22["Metric"]],{4,4},TestID->"26-full-metric-shape"],
+ VerificationTest[Dimensions[v22["InducedK"]],{2,2,2},TestID->"27-K-shape"],
+ VerificationTest[v22["InducedK"][[1,1,1]],t,TestID->"28-K-has-time-variation"],
+ VerificationTest[v22["InducedK"][[1,2,2]],y/2,TestID->"29-K-keeps-t-y-mixing"],
+ VerificationTest[Dimensions[v22["InducedC"]],{2,2,2},TestID->"30-C-shape"],
+ VerificationTest[v22["InducedC"][[1,2,2]],y,TestID->"31-C-from-external-y-dependence"],
+ VerificationTest[badBare,$Failed,TestID->"32-no-hidden-constant-warps"],
+ VerificationTest[badShapes,$Failed,TestID->"33-dimension-validation"],
+ VerificationTest[badAsym,$Failed,TestID->"34-symmetry-validation"],
+ VerificationTest[old["Verified"],True,TestID->"35-old-special-case-valid"],
+ VerificationTest[new["Verified"],True,TestID->"36-new-special-case-valid"],
+ VerificationTest[PossibleZeroQ[new["RicciScalar"]-old["RicciScalar"]],
+   True,TestID->"37-old-new-scalar-agreement"],
+ VerificationTest[And@@(PossibleZeroQ/@Flatten[
+   new["RicciTensor"]-old["RicciTensor"]]),
+   True,TestID->"38-old-new-all-Ricci-agreement"],
+ VerificationTest[And@@(PossibleZeroQ/@Flatten[
+   new["EinsteinTensor"]-old["EinsteinTensor"]]),
+   True,TestID->"39-old-new-all-Einstein-agreement"],
+ VerificationTest[PossibleZeroQ[v11["RicciScalar"]-
+   v11["Derived"]["RicciScalar"]],True,TestID->"40-variable-reference-scalar"]
+};
+fullReport=TestReport[full];
+fullSummary=<|"Total"->Length[full],
+ "Passed"->Length[fullReport[[1]]["TestsSucceededKeys"]],
+ "Failed"->Length[fullReport[[1]]["TestsFailedWrongResultsKeys"]]+
+ Length[fullReport[[1]]["TestsFailedWithMessagesKeys"]]|>;
+{formalSummary,fullSummary}
