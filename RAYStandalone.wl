@@ -3711,8 +3711,7 @@ RAYDoubleWarpedGeometry[d_,n_,A_,B_,OptionsPattern[]]:=Module[
  registered=ListQ[xs]&&ListQ[ys]&&
    AllTrue[Join[xs,ys],Head[#]===Symbol&]&&
    Length[DeleteDuplicates[Join[xs,ys]]]==Length[Join[xs,ys]]&&
-   ( !IntegerQ[d]||Length[xs]==d )&&
-   ( !IntegerQ[n]||Length[ys]==n );
+   IntegerQ[d]&&IntegerQ[n]&&Length[xs]==d&&Length[ys]==n;
  If[!(xs===Automatic&&ys===Automatic)&&!registered,
   Return[rayFail["RAYDoubleWarpedGeometry: both complete disjoint ExternalCoordinates and InternalCoordinates lists are required to infer dependence, and sizes must agree with d,n."]]];
  (* Bare symbolic tensor fields are never silently considered constant.
