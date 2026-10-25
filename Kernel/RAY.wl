@@ -244,6 +244,12 @@ RAYCovariantBox::usage = "RAYCovariantBox[f] formally represents the base metric
 RAYGradientNorm::usage = "RAYGradientNorm[f] formally represents (nabla f)^2 = g^ab partial_a f partial_b f.";
 
 
+RAYGeneralBlockGeometry::usage = "RAYGeneralBlockGeometry[d,n,A,B] is an exact d+n general orthogonal-block curvature model; both reference metrics may depend on ALL coordinates.";
+RAYGeneralBlockReport::usage = "RAYGeneralBlockReport[model] displays the full Ricci, scalar and Einstein tensor decomposition in C=partial_y H/2 and K=partial_x Q/2.";
+RAYGeneralBlockToComponents::usage = "RAYGeneralBlockToComponents[model,name,x,y,hatg,tildeg] evaluates arbitrary cross-dependent block metrics and verifies all Ricci and Einstein components.";
+RAYBlockTerm::usage = "RAYBlockTerm[name,indices] represents a named covariant derivative or contraction in the full orthogonal-block tensor identities.";
+RAYBlockTrace::usage = "RAYBlockTrace[sector,expr] denotes contraction with H inverse or Q inverse.";
+
 RAYDoubleWarpedGeometry::usage = "RAYDoubleWarpedGeometry[d,n,A,B] derives fully general d+n doubly twisted Ricci and Einstein tensor blocks for A(x,y),B(x,y), with arbitrary reference metrics.";
 RAYDoubleWarpedReport::usage = "RAYDoubleWarpedReport[model] displays fully general abstract crossed warp curvature identities.";
 RAYDoubleWarpedToComponents::usage = "RAYDoubleWarpedToComponents[model,name,externalCoordinates,internalCoordinates,externalMetric,internalMetric] builds and verifies concrete tensor components.";
@@ -267,7 +273,7 @@ RAYUpdateStandalone::usage = "RAYUpdateStandalone[] is a compatibility alias for
 
 Begin["`Private`"];
 
-$RAYVersion = "1.4.0";
+$RAYVersion = "1.5.0";
 RAYVersion := $RAYVersion;
 
 $rayMetrics = <||>;
