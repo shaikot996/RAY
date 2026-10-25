@@ -16,7 +16,7 @@ zero=RAYDoubleWarpedGeometry[d,n,0,0];
 legacy=RAYCrossWarpedGeometry[4,6,A,B,"WarpDependence"->"Separated"];
 generalViaLegacy=RAYCrossWarpedGeometry[d,n,A,B,"WarpDependence"->"General"];
 checks={
- VerificationTest[RAYVersion,"1.4.0",TestID->"01-version"],
+ VerificationTest[RAYVersion,"1.5.0",TestID->"01-version"],
  VerificationTest[g["Type"],"GeneralDoubleWarpedGeometry",TestID->"02-type"],
  VerificationTest[g["TotalDimension"],d+n,TestID->"03-symbolic-dim"],
  VerificationTest[AllTrue[names,KeyExistsQ[g,#]&],True,TestID->"04-seven-sectors"],
