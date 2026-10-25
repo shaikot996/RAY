@@ -77,10 +77,7 @@ If[!TrueQ[Global`$RAYAutoUpdateOnLoad===False]&&
   status
  ],35,"Offline"],"Offline"];
  If[Global`$RAYAutoUpdateLoadResult==="Reload",
-   Print["RAY updated to a newer verified release during Needs loading."];
-   Block[{Global`$RAYAutoUpdateReenter=True},
-      Get[$InputFileName]];
-   Return[Null];
+   Print["RAY file verified and replaced. Loading upgraded source into the active kernel."];
  ];
 ];
 
@@ -4294,3 +4291,12 @@ $rayHelpRows=Join[$rayHelpRows,{
 End[];
 
 EndPackage[];
+
+(* Complete a verified Needs-time update only after the original source has
+   finished evaluation: avoids obsolete definitions overwriting newer ones. *)
+If[Global`$RAYAutoUpdateLoadResult==="Reload"&&
+   !TrueQ[Global`$RAYAutoUpdateReenter],
+ Block[{Global`$RAYAutoUpdateReenter=True,
+   Global`$RAYAutoUpdateLoadResult="Reloaded"},
+  Get[$InputFileName]];
+];
