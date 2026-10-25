@@ -15,7 +15,7 @@ modSphere=RAYCovariantWarpedMetric["CovariantSphere",{t,x},gBase,2,B[t,x],
  "IntrinsicGeometry"->{"ConstantCurvature",1}];
 
 tests={
- VerificationTest[RAYVersion,"1.4.0",TestID->"version"],
+ VerificationTest[RAYVersion,"1.5.0",TestID->"version"],
  VerificationTest[Quiet[RAYGeneralWarpedMetric[d,n,A[t,x],B[t],"Time"->t]],
   $Failed,TestID->"reject-multivariable-A"],
  VerificationTest[Quiet[RAYGeneralWarpedMetric[d,n,A[t],B[t,x],"Time"->t]],
