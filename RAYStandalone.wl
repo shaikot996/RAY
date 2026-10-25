@@ -1,5 +1,89 @@
 (* RAY standalone v1.5.0 — exact constant-field derivatives in crossed warped products. *)
 
+(* --- Embedded Kernel/RAYAutoBootstrap.wl --- *)
+(* ::Package:: *)
+(* Standalone source bootstrap, ahead of BeginPackage.
+   New versions are installed with SHA256 comparison and a backup.
+   Turn off with Global`$RAYAutoUpdateOnLoad=False before Needs. *)
+
+If[!TrueQ[Global`$RAYAutoUpdateOnLoad===False]&&
+   !TrueQ[Global`$RAYAutoUpdateReenter]&&
+   StringQ[$InputFileName]&&FileExistsQ[$InputFileName]&&
+   FileNameTake[$InputFileName]==="RAY.wl",
+ Global`$RAYAutoUpdateLoadResult=Quiet@Check[TimeConstrained[
+ Module[{target=$InputFileName,
+   url="https://github.com/shaikot996/RAY/releases/latest/download/",
+   candidate,checksumFile,stage,backup,installedText,currentVersions,
+   newText,newVersions,expected,hash,entries,selected,status,tmpOk},
+  candidate=CreateTemporary[];
+  checksumFile=CreateTemporary[];
+  status=Catch[
+   tmpOk=Quiet@Check[TimeConstrained[
+     URLDownload[url<>"RAY.wl",candidate],12,$Failed],$Failed];
+   If[tmpOk===$Failed||!FileExistsQ[candidate]||
+      FileByteCount[candidate]<20000,Throw["Offline"]];
+   newText=Quiet@Check[Import[candidate,"Text"],$Failed];
+   installedText=Quiet@Check[Import[target,"Text"],$Failed];
+   If[!StringQ[newText]||!StringQ[installedText],
+     Throw["Unchanged"]];
+   currentVersions=StringCases[installedText,
+     RegularExpression["\\$RAYVersion\\s*=\\s*\"([0-9]+\\.[0-9]+\\.[0-9]+)\""]->"$1"];
+   newVersions=StringCases[newText,
+     RegularExpression["\\$RAYVersion\\s*=\\s*\"([0-9]+\\.[0-9]+\\.[0-9]+)\""]->"$1"];
+   If[Length[currentVersions]=!=1||Length[newVersions]=!=1,
+     Throw["Unchanged"]];
+   If[!TrueQ[OrderedQ[{
+      ToExpression/@StringSplit[currentVersions[[1]],"."],
+      ToExpression/@StringSplit[newVersions[[1]],"."]}]]||
+      currentVersions[[1]]===newVersions[[1]],Throw["Unchanged"]];
+   If[!StringContainsQ[newText,"BeginPackage[\"RAY`\"]"]||
+      !StringContainsQ[newText,"EndPackage[]"]||
+      !StringStartsQ[newText,"(* RAY standalone v"],
+     Throw["Unchanged"]];
+   tmpOk=Quiet@Check[TimeConstrained[
+     URLDownload[url<>"SHA256SUMS.txt",checksumFile],12,$Failed],$Failed];
+   If[tmpOk===$Failed||!FileExistsQ[checksumFile],
+     Throw["Offline"]];
+   entries=StringSplit[StringTrim[#]]&/@
+       StringSplit[Import[checksumFile,"Text"],"\n"];
+   selected=Select[entries,Length[#]>=2&&Last[#]==="RAY.wl"&];
+   If[Length[selected]=!=1||
+      !StringMatchQ[First[selected[[1]]],
+        RegularExpression["[0-9a-fA-F]{64}"]],
+     Throw["InvalidChecksum"]];
+   expected=ToLowerCase[First[selected[[1]]]];
+   hash=ToLowerCase[FileHash[candidate,"SHA256","HexString"]];
+   If[expected=!=hash,Throw["InvalidChecksum"]];
+   stage=target<>".new";backup=target<>".previous";
+   If[FileExistsQ[stage],DeleteFile[stage]];
+   If[Quiet@Check[CopyFile[candidate,stage];True,$Failed]=!=True,
+     Throw["Unchanged"]];
+   If[ToLowerCase[FileHash[stage,"SHA256","HexString"]]=!=expected,
+     DeleteFile[stage];Throw["InvalidChecksum"]];
+   If[FileExistsQ[backup],DeleteFile[backup]];
+   If[Quiet@Check[CopyFile[target,backup];True,$Failed]=!=True,
+     DeleteFile[stage];Throw["Unchanged"]];
+   If[Quiet@Check[
+     RenameFile[stage,target,OverwriteTarget->True];True,$Failed]=!=True,
+     If[FileExistsQ[stage],DeleteFile[stage]];
+     Throw["Unchanged"]];
+   If[ToLowerCase[FileHash[target,"SHA256","HexString"]]=!=expected,
+     CopyFile[backup,target,OverwriteTarget->True];
+     Throw["InvalidChecksum"]];
+   "Reload"
+  ];
+  If[FileExistsQ[candidate],DeleteFile[candidate]];
+  If[FileExistsQ[checksumFile],DeleteFile[checksumFile]];
+  status
+ ],35,"Offline"],"Offline"];
+ If[Global`$RAYAutoUpdateLoadResult==="Reload",
+   Print["RAY updated to a newer verified release during Needs loading."];
+   Block[{Global`$RAYAutoUpdateReenter=True},
+      Get[$InputFileName]];
+   Return[Null];
+ ];
+];
+
 (* ::Package:: *)
 
 BeginPackage["RAY`"];
